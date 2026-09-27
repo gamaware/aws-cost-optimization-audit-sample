@@ -1,8 +1,0 @@
-# Shared workflows from gamaware/.github are called at @main until a reviewed commit SHA exists
-# (tracked in CHANGELOG "Unreleased"). Every third-party action stays hash-pinned.
-rules:
-  unpinned-uses:
-    config:
-      policies:
-        "gamaware/*": ref-pin
-        "*": hash-pin

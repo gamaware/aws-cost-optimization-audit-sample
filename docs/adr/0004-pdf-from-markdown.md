@@ -31,4 +31,4 @@ always gives the same bytes. The SHA-256 of the Markdown goes into the PDF keywo
 
 - `make check` runs `scripts/build_pdf.py --check`, and
   `tests/test_report.py::test_pdf_was_built_from_the_committed_markdown` runs the same check.
-- The CI report job rebuilds the PDF with pandoc 3.11 and fails if the result differs from the commit.
+- The CI `report-typst` job rebuilds the PDF with pandoc 3.11 and fails if the result differs from the commit.

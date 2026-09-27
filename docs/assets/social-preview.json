@@ -1,0 +1,11 @@
+{
+  "color": "#5E4A12",
+  "heading": ["AWS cost audit", "with ranked savings"],
+  "subtitle": "CUR · rightsizing · Savings Plans · tagging",
+  "steps": [
+    {"label": "Break down spend"},
+    {"label": "Price every saving"},
+    {"label": "Rank quick wins"}
+  ],
+  "illustration": "social-preview-illustration.svg"
+}

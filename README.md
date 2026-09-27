@@ -138,7 +138,8 @@ docs/                  methodology, ADRs, diagrams, cover image
 | actionlint, zizmor | pre-commit and shared `lint-actions` workflow | Safe workflows: SHA pins, least privilege |
 | gitleaks, detect-secrets | pre-commit and shared `secrets` workflow | No credentials in a public repo |
 | Semgrep, Trivy, Checkov | shared `security` workflow | Code, dependency and configuration scanning |
-| Rebuild of evidence, report and PDF with pinned pandoc | CI report job | The committed PDF matches the reviewed Markdown |
+| Evidence regeneration, plus a LaTeX PDF artifact | shared `report` workflow | Evidence reproduces from the committed scripts |
+| Rebuild of evidence, report and PDF with pinned pandoc | CI `report-typst` job | The committed PDF matches the reviewed Markdown |
 
 Workflow-level `permissions: {}` applies to the CI jobs, which use no cloud credentials.
 
