@@ -9,6 +9,7 @@ PY := PYTHONPATH=scripts $(RUN) python
 
 ## verify: everything CI runs (lint, tests, output freshness)
 verify: lint test check
+	@echo "verify: all checks passed"
 
 ## lint: ruff lint and format checks on scripts and tests
 lint:
