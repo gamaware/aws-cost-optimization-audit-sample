@@ -10,7 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from decimal import Decimal
 
-from .findings import Detail, Finding, floor_to, rds_target_cost
+from .findings import Detail, Finding, aurora_layout, floor_to, rds_target_cost
 from .model import D, Dataset
 
 
@@ -148,9 +148,7 @@ def rds_ri_finding(ds: Dataset) -> Finding:
             cls, multi = opt["dbInstanceClass"], opt["multiAZ"]
         else:
             cls, multi = rec["currentDBInstanceClass"], rec["multiAZ"]
-        od = rds_target_cost(ds, cls, multi, Decimal(0))
+        od = rds_target_cost(ds, cls, multi)
         name = rec["resourceArn"].rsplit(":", 1)[1]
-        f.details.append(
-            Detail(rec["accountId"], name, f"{cls} {'Multi-AZ' if multi else 'Single-AZ'}", od, od * (1 - discount))
-        )
+        f.details.append(Detail(rec["accountId"], name, f"{cls} {aurora_layout(multi)}", od, od * (1 - discount)))
     return f

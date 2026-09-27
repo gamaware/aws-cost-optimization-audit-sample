@@ -1,6 +1,6 @@
 id,key,account,resource,description,current_usd,target_usd,saving_usd
-SAV-02,rightsize-rds-prod,111122223333,orders-db,db.r5.4xlarge Multi-AZ to db.r5.2xlarge Multi-AZ,3150.00,1690.00,1460.00
-SAV-03,rightsize-rds-staging,444455556666,orders-db-stg,db.r5.2xlarge Multi-AZ to db.r5.large Single-AZ,1575.00,240.00,1335.00
+SAV-02,rightsize-rds-prod,111122223333,orders-db,db.r5.4xlarge writer and reader to db.r5.2xlarge writer and reader,3387.20,1693.60,1693.60
+SAV-03,rightsize-rds-staging,444455556666,orders-db-stg,db.r5.2xlarge writer and reader to db.r5.large writer only,1693.60,211.70,1481.90
 SAV-01,rightsize-ec2,111122223333,i-0a200000000000001,"app-01: m5.2xlarge to m5.xlarge (max CPU 17%, max memory 34%)",280.32,140.16,140.16
 SAV-01,rightsize-ec2,111122223333,i-0a200000000000002,"app-02: m5.2xlarge to m5.xlarge (max CPU 17%, max memory 34%)",280.32,140.16,140.16
 SAV-01,rightsize-ec2,111122223333,i-0a200000000000003,"app-03: m5.2xlarge to m5.xlarge (max CPU 17%, max memory 34%)",280.32,140.16,140.16
@@ -12,8 +12,8 @@ SAV-04,schedule-staging,444455556666,i-0b100000000000002,stg-app-02 (m5.2xlarge)
 SAV-04,schedule-staging,444455556666,i-0b100000000000003,stg-app-03 (m5.2xlarge),280.32,99.84,180.48
 SAV-04,schedule-staging,444455556666,i-0b100000000000004,stg-app-04 (m5.2xlarge),280.32,99.84,180.48
 SAV-15,compute-savings-plan,111122223333,new Compute Savings Plan,commitment 2.402 USD/hour,2404.75,1753.46,651.29
-SAV-16,rds-reserved-instances,111122223333,orders-db,db.r5.2xlarge Multi-AZ,1460.00,1022.00,438.00
-SAV-16,rds-reserved-instances,111122223333,reporting-db,db.r5.xlarge Single-AZ,365.00,255.50,109.50
+SAV-16,rds-reserved-instances,111122223333,orders-db,db.r5.2xlarge writer and reader,1693.60,1185.52,508.08
+SAV-16,rds-reserved-instances,111122223333,reporting-db,db.r5.xlarge writer only,423.40,296.38,127.02
 SAV-11,log-retention,111122223333,/harbor-goods/order-api,"application, never expires to 30 days, 9,000 GB stored to 360 GB",270.00,10.80,259.20
 SAV-11,log-retention,111122223333,/harbor-goods/storefront,"application, never expires to 30 days, 3,600 GB stored to 90 GB",108.00,2.70,105.30
 SAV-11,log-retention,111122223333,/harbor-goods/vpc-flow,"network, never expires to 180 days, 4,800 GB stored to 720 GB",144.00,21.60,122.40

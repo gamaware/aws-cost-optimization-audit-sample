@@ -1,10 +1,10 @@
 rank,id,key,title,monthly_usd,annual_usd,one_time_usd,effort,risk,type
-1,SAV-02,rightsize-rds-prod,Rightsize the production orders database,1460.00,17520.00,0,Medium,Medium,Planned work
-2,SAV-03,rightsize-rds-staging,Rightsize the staging orders database and drop Multi-AZ,1335.00,16020.00,0,Low,Low,Quick win
+1,SAV-02,rightsize-rds-prod,Rightsize the production orders database,1693.60,20323.20,0,Medium,Medium,Planned work
+2,SAV-03,rightsize-rds-staging,Rightsize the staging orders database and remove its reader,1481.90,17782.80,0,Low,Low,Quick win
 3,SAV-01,rightsize-ec2,Rightsize over-provisioned EC2 instances,840.96,10091.52,0,Medium,Medium,Planned work
 4,SAV-04,schedule-staging,Run staging order-api instances on a working-hours schedule,721.92,8663.04,0,Low,Low,Quick win
 5,SAV-15,compute-savings-plan,Buy a one-year Compute Savings Plan for the steady EC2 baseline,651.29,7815.48,0,Low,Medium,Planned work
-6,SAV-16,rds-reserved-instances,Buy one-year RDS Reserved Instances for production after the resize,547.50,6570.00,0,Low,Medium,Planned work
+6,SAV-16,rds-reserved-instances,Buy one-year RDS Reserved Instances for production after the resize,635.10,7621.20,0,Low,Medium,Planned work
 7,SAV-11,log-retention,Set CloudWatch Logs retention on groups that never expire,539.55,6474.60,0,Low,Low,Quick win
 8,SAV-05,unattached-ebs,Delete unattached EBS volumes after a rollback snapshot,385.00,4620.00,212.50,Low,Low,Quick win
 9,SAV-13,s3-lifecycle,Move application logs older than 30 days to S3 Glacier Instant Retrieval,378.50,4542.00,800.00,Low,Low,Quick win

@@ -11,33 +11,33 @@
 | Client | Harbor Goods (fictional mid-size retailer) |
 | Scope | 3 AWS accounts in one AWS Organization, region `us-east-1` |
 | Billing window | M1 to M3 (three monthly billing periods, oldest first) |
-| Analysis period | M3, net unblended cost $23,033.64 |
+| Analysis period | M3, net unblended cost $24,070.34 |
 | Access used | Read-only exports; no change was made to any account |
 | Deliverable | This report, `evidence/` and the scripts that produced both |
 
 ## 1. Executive summary
 
-AWS spending for Harbor Goods reached $23,033.64 in M3, an increase of
-10.5% ($2,194.08) from M1. Across 16 opportunities,
-the audit estimates savings of **$7,666.87 a month ($92,002.44 a year)**,
-equivalent to 33.3% of the M3 bill. Completing every recommendation would bring
-monthly costs for the same workload to approximately $15,366.77.
+AWS spending for Harbor Goods reached $24,070.34 in M3, an increase of
+10.0% ($2,194.08) from M1. Across 16 opportunities,
+the audit estimates savings of **$8,134.97 a month ($97,619.64 a year)**,
+equivalent to 33.8% of the M3 bill. Completing every recommendation would bring
+monthly costs for the same workload to approximately $15,935.37.
 
-- **10 quick wins** offer $3,742.22 in monthly savings at low effort and low
+- **10 quick wins** offer $3,889.12 in monthly savings at low effort and low
   risk. Most involve removing idle resources or changing a single setting; a platform engineer can
   complete these within a week.
-- **6 planned items** offer $3,924.65 in monthly savings. Each requires
+- **6 planned items** offer $4,245.85 in monthly savings. Each requires
   a load test, release or one-year commitment and therefore needs a change ticket and rollback plan.
 - One-time expenses of $1,012.50 cover rollback snapshots for volume deletions and S3
   lifecycle transition requests. Each expense pays back within a few months.
 
 The largest three opportunities account for these estimated monthly savings:
 
-1. **SAV-02: Rightsize the production orders database** reduces monthly costs by $1,460.00.
-2. **SAV-03: Rightsize the staging orders database and drop Multi-AZ** reduces monthly costs by $1,335.00.
+1. **SAV-02: Rightsize the production orders database** reduces monthly costs by $1,693.60.
+2. **SAV-03: Rightsize the staging orders database and remove its reader** reduces monthly costs by $1,481.90.
 3. **SAV-01: Rightsize over-provisioned EC2 instances** reduces monthly costs by $840.96.
 
-Incomplete tagging also limits cost allocation: `cost-center` appears on only 78.1%
+Incomplete tagging also limits cost allocation: `cost-center` appears on only 79.0%
 of spending in M3. Finance therefore cannot yet provide individual team bills.
 Section 9 describes the corrective work.
 
@@ -45,7 +45,7 @@ Section 9 describes the corrective work.
 
 Only exports inform this audit, matching the files a client would supply through read-only access:
 
-- **Cost and Usage Report (CUR 2.0 columns)**: `data/synthetic/cur/` contains 372 line
+- **Cost and Usage Report (CUR 2.0 columns)**: `data/synthetic/cur/` contains 381 line
   items covering 13 services, aggregated by resource and billing period.
 - **AWS Compute Optimizer**: recommendations for EC2 and RDS based on a 14-day look-back.
 - **AWS Trusted Advisor**: cost-optimization checks identifying idle and unattached resources.
@@ -73,14 +73,14 @@ us-east-1 are also beyond scope.
 
 | Service | M1 | M2 | M3 | Change M1 to M3 | Share of M3 |
 | -------------------------- | ------------: | ------------: | ------------: | -------------------: | -------------: |
-| Amazon EC2 (instances, EBS, NAT) | $6,385.67 | $7,758.95 | $7,785.95 | $1,400.28 (21.9%) | 33.8% |
-| Amazon RDS | $5,147.50 | $5,147.50 | $5,147.50 | $0.00 (0.0%) | 22.3% |
-| Amazon CloudFront | $2,380.00 | $2,465.00 | $2,550.00 | $170.00 (7.1%) | 11.1% |
-| Amazon CloudWatch | $1,345.00 | $1,486.00 | $1,627.00 | $282.00 (21.0%) | 7.1% |
-| Amazon Redshift | $1,585.56 | $1,585.56 | $1,585.56 | $0.00 (0.0%) | 6.9% |
-| Amazon S3 | $1,448.00 | $1,497.00 | $1,545.00 | $97.00 (6.7%) | 6.7% |
-| All other (7 services) | $2,547.83 | $2,671.03 | $2,792.63 | $244.80 (9.6%) | 12.1% |
-| **Total** | **$20,839.56** | **$22,611.04** | **$23,033.64** | **$2,194.08 (10.5%)** | **100.0%** |
+| Amazon EC2 (instances, EBS, NAT) | $6,385.67 | $7,758.95 | $7,785.95 | $1,400.28 (21.9%) | 32.3% |
+| Amazon RDS | $6,184.20 | $6,184.20 | $6,184.20 | $0.00 (0.0%) | 25.7% |
+| Amazon CloudFront | $2,380.00 | $2,465.00 | $2,550.00 | $170.00 (7.1%) | 10.6% |
+| Amazon CloudWatch | $1,345.00 | $1,486.00 | $1,627.00 | $282.00 (21.0%) | 6.8% |
+| Amazon Redshift | $1,585.56 | $1,585.56 | $1,585.56 | $0.00 (0.0%) | 6.6% |
+| Amazon S3 | $1,448.00 | $1,497.00 | $1,545.00 | $97.00 (6.7%) | 6.4% |
+| All other (7 services) | $2,547.83 | $2,671.03 | $2,792.63 | $244.80 (9.6%) | 11.6% |
+| **Total** | **$21,876.26** | **$23,647.74** | **$24,070.34** | **$2,194.08 (10.0%)** | **100.0%** |
 
 Spending increased $2,194.08 across the billing window, with the largest changes in:
 
@@ -95,9 +95,9 @@ The account breakdown follows:
 
 | Account | M1 | M2 | M3 | Change M1 to M3 | Share of M3 |
 | -------------------------------- | ------------: | ------------: | ------------: | ------------------: | -------------: |
-| `111122223333` (production) | $16,727.29 | $17,762.63 | $18,134.73 | $1,407.44 (8.4%) | 78.7% |
-| `444455556666` (staging) | $2,871.24 | $3,536.38 | $3,540.88 | $669.64 (23.3%) | 15.4% |
-| `123456789012` (shared services) | $1,241.03 | $1,312.03 | $1,358.03 | $117.00 (9.4%) | 5.9% |
+| `111122223333` (production) | $17,575.39 | $18,610.73 | $18,982.83 | $1,407.44 (8.0%) | 78.9% |
+| `444455556666` (staging) | $3,059.84 | $3,724.98 | $3,729.48 | $669.64 (21.9%) | 15.5% |
+| `123456789012` (shared services) | $1,241.03 | $1,312.03 | $1,358.03 | $117.00 (9.4%) | 5.6% |
 
 ## 4. Ranked savings
 
@@ -107,12 +107,12 @@ calculations for individual resources.
 
 | Rank | ID | Recommendation | Monthly | Annual | One-time cost | Effort | Risk | Type |
 | ------: | -------- | -------------------------- | -----------: | ------------: | ---------------: | -------- | -------- | -------------- |
-| 1 | SAV-02 | Rightsize the production orders database | $1,460.00 | $17,520.00 | none | Medium | Medium | Planned work |
-| 2 | SAV-03 | Rightsize the staging orders database and drop Multi-AZ | $1,335.00 | $16,020.00 | none | Low | Low | Quick win |
+| 1 | SAV-02 | Rightsize the production orders database | $1,693.60 | $20,323.20 | none | Medium | Medium | Planned work |
+| 2 | SAV-03 | Rightsize the staging orders database and remove its reader | $1,481.90 | $17,782.80 | none | Low | Low | Quick win |
 | 3 | SAV-01 | Rightsize over-provisioned EC2 instances | $840.96 | $10,091.52 | none | Medium | Medium | Planned work |
 | 4 | SAV-04 | Run staging order-api instances on a working-hours schedule | $721.92 | $8,663.04 | none | Low | Low | Quick win |
 | 5 | SAV-15 | Buy a one-year Compute Savings Plan for the steady EC2 baseline | $651.29 | $7,815.48 | none | Low | Medium | Planned work |
-| 6 | SAV-16 | Buy one-year RDS Reserved Instances for production after the resize | $547.50 | $6,570.00 | none | Low | Medium | Planned work |
+| 6 | SAV-16 | Buy one-year RDS Reserved Instances for production after the resize | $635.10 | $7,621.20 | none | Low | Medium | Planned work |
 | 7 | SAV-11 | Set CloudWatch Logs retention on groups that never expire | $539.55 | $6,474.60 | none | Low | Low | Quick win |
 | 8 | SAV-05 | Delete unattached EBS volumes after a rollback snapshot | $385.00 | $4,620.00 | $212.50 | Low | Low | Quick win |
 | 9 | SAV-13 | Move application logs older than 30 days to S3 Glacier Instant Retrieval | $378.50 | $4,542.00 | $800.00 | Low | Low | Quick win |
@@ -123,17 +123,17 @@ calculations for individual resources.
 | 14 | SAV-14 | Consolidate staging NAT gateways to one | $64.90 | $778.80 | none | Medium | Low | Planned work |
 | 15 | SAV-09 | Delete idle load balancers | $34.68 | $416.16 | none | Low | Low | Quick win |
 | 16 | SAV-08 | Release unassociated Elastic IP addresses | $14.60 | $175.20 | none | Low | Low | Quick win |
-| | | **Total** | **$7,666.87** | **$92,002.44** | **$1,012.50** | | | |
+| | | **Total** | **$8,134.97** | **$97,619.64** | **$1,012.50** | | | |
 
 ## 5. Quick wins versus planned work
 
-**Quick wins: $3,742.22 monthly ($44,906.64 annually).** Complete these before planned
+**Quick wins: $3,889.12 monthly ($46,669.44 annually).** Complete these before planned
 work, following rank order within a single change window. Every item either supports a direct
 reversal or retains a snapshot until validation confirms the change.
 
 | ID | Recommendation | Monthly | Why this effort and risk |
 | -------- | -------------------------- | -----------: | -------------------------- |
-| SAV-03 | Rightsize the staging orders database and drop Multi-AZ | $1,335.00 | Staging only; a short outage during the modification is acceptable. |
+| SAV-03 | Rightsize the staging orders database and remove its reader | $1,481.90 | Staging only; the writer restarts during the class change, and a short outage is acceptable. |
 | SAV-04 | Run staging order-api instances on a working-hours schedule | $721.92 | Instance Scheduler or an EventBridge schedule; staging is idle outside working hours. |
 | SAV-11 | Set CloudWatch Logs retention on groups that never expire | $539.55 | One setting per log group; export anything under a compliance hold first. |
 | SAV-05 | Delete unattached EBS volumes after a rollback snapshot | $385.00 | Snapshot each volume first, then delete; the snapshot is the rollback. |
@@ -144,7 +144,7 @@ reversal or retains a snapshot until validation confirms the change.
 | SAV-09 | Delete idle load balancers | $34.68 | No requests in 14 days; delete after checking DNS. |
 | SAV-08 | Release unassociated Elastic IP addresses | $14.60 | Release after confirming no DNS record or allow list points at the address. |
 
-**Planned work: $3,924.65 monthly ($47,095.80 annually).** Follow this order:
+**Planned work: $4,245.85 monthly ($50,950.20 annually).** Follow this order:
 
 1. Complete rightsizing (SAV-02, SAV-01) before purchasing
    commitments. Each resize requires a load test and maintenance window, with a return to the
@@ -156,10 +156,10 @@ reversal or retains a snapshot until validation confirms the change.
 
 | ID | Recommendation | Monthly | Why this effort and risk |
 | -------- | -------------------------- | -----------: | -------------------------- |
-| SAV-02 | Rightsize the production orders database | $1,460.00 | Class change causes a Multi-AZ failover; schedule it in a maintenance window after a load test. |
+| SAV-02 | Rightsize the production orders database | $1,693.60 | Resize the reader, fail over to it, then resize the old writer; schedule it in a maintenance window after a load test. |
 | SAV-01 | Rightsize over-provisioned EC2 instances | $840.96 | Instance type change needs a rolling replacement and a load test on memory headroom. |
 | SAV-15 | Buy a one-year Compute Savings Plan for the steady EC2 baseline | $651.29 | A one-year commitment; buy it after rightsizing so it does not lock in oversized usage. |
-| SAV-16 | Buy one-year RDS Reserved Instances for production after the resize | $547.50 | A one-year commitment; buy it after the orders-db resize. |
+| SAV-16 | Buy one-year RDS Reserved Instances for production after the resize | $635.10 | A one-year commitment; buy it after the orders-db resize. |
 | SAV-12 | Turn off DEBUG logging in production order-api | $360.00 | Needs an application config change and a release of order-api. |
 | SAV-14 | Consolidate staging NAT gateways to one | $64.90 | Route table changes in staging; an AZ outage would cut staging egress, which is acceptable. |
 
@@ -213,8 +213,8 @@ current instance type.
 | SAV-01 | `111122223333` | `i-0a200000000000004` | app-04: m5.2xlarge to m5.xlarge (max CPU 17%, max memory 34%) | $280.32 | $140.16 | $140.16 |
 | SAV-01 | `111122223333` | `i-0a200000000000005` | app-05: m5.2xlarge to m5.xlarge (max CPU 17%, max memory 34%) | $280.32 | $140.16 | $140.16 |
 | SAV-01 | `111122223333` | `i-0a200000000000006` | app-06: m5.2xlarge to m5.xlarge (max CPU 17%, max memory 34%) | $280.32 | $140.16 | $140.16 |
-| SAV-02 | `111122223333` | `orders-db` | db.r5.4xlarge Multi-AZ to db.r5.2xlarge Multi-AZ | $3,150.00 | $1,690.00 | $1,460.00 |
-| SAV-03 | `444455556666` | `orders-db-stg` | db.r5.2xlarge Multi-AZ to db.r5.large Single-AZ | $1,575.00 | $240.00 | $1,335.00 |
+| SAV-02 | `111122223333` | `orders-db` | db.r5.4xlarge writer and reader to db.r5.2xlarge writer and reader | $3,387.20 | $1,693.60 | $1,693.60 |
+| SAV-03 | `444455556666` | `orders-db-stg` | db.r5.2xlarge writer and reader to db.r5.large writer only | $1,693.60 | $211.70 | $1,481.90 |
 | SAV-04 | `444455556666` | `i-0b100000000000001` | stg-app-01 (m5.2xlarge) | $280.32 | $99.84 | $180.48 |
 | SAV-04 | `444455556666` | `i-0b100000000000002` | stg-app-02 (m5.2xlarge) | $280.32 | $99.84 | $180.48 |
 | SAV-04 | `444455556666` | `i-0b100000000000003` | stg-app-03 (m5.2xlarge) | $280.32 | $99.84 | $180.48 |
@@ -241,7 +241,7 @@ CUR line types establish the following coverage for M3:
 | Savings Plans coverage | 8.9% |
 | Existing plan utilization | 100.0% |
 | Observed Savings Plan discount (1 - fee / covered) | 27.1% |
-| RDS instance-hour spend (M3) | $4,745.00 |
+| RDS instance-hour spend (M3) | $5,504.20 |
 | RDS Reserved Instance coverage | 0.0% |
 
 The existing Compute Savings Plan is fully utilized and applies exclusively to the storefront
@@ -290,14 +290,14 @@ The following instances form the baseline:
 **RDS Reserved Instances (SAV-16).** Current RDS coverage stands at
 0.0%. Once orders-db has been resized, reserve both production databases under
 one-year terms with no upfront payment. A 30% discount supplies the planning
-estimate; verify the actual rate through the Price List API before purchase. RDS MySQL Reserved
-Instances support size flexibility within an instance family. Purchasing after resizing still
+estimate; verify the actual rate through the Price List API before purchase. Aurora PostgreSQL
+Reserved Instances support size flexibility within an instance family. Purchasing after resizing still
 aligns the commitment with the running resources.
 
 | ID | Account | Resource | Detail | Current/mo | Target/mo | Saving/mo |
-| -------- | -------------- | -------------- | ------------------------ | ------------: | -----------: | -----------: |
-| SAV-16 | `111122223333` | `orders-db` | db.r5.2xlarge Multi-AZ | $1,460.00 | $1,022.00 | $438.00 |
-| SAV-16 | `111122223333` | `reporting-db` | db.r5.xlarge Single-AZ | $365.00 | $255.50 | $109.50 |
+| -------- | -------------- | -------------- | -------------------------- | ------------: | -----------: | -----------: |
+| SAV-16 | `111122223333` | `orders-db` | db.r5.2xlarge writer and reader | $1,693.60 | $1,185.52 | $508.08 |
+| SAV-16 | `111122223333` | `reporting-db` | db.r5.xlarge writer only | $423.40 | $296.38 | $127.02 |
 
 This audit models both commitments without purchasing either. Harbor Goods retains responsibility
 for the decision and purchase.
@@ -342,9 +342,9 @@ for the decision and purchase.
 
 | Required tag | Share of M3 cost tagged | Untagged cost |
 | -------------- | -------------------------: | ---------------: |
-| `application` | 89.2% | $2,494.25 |
-| `environment` | 87.8% | $2,809.61 |
-| `cost-center` | 78.1% | $5,044.25 |
+| `application` | 89.6% | $2,494.25 |
+| `environment` | 88.3% | $2,809.61 |
+| `cost-center` | 79.0% | $5,044.25 |
 
 Spending without tags in M3 has three components. Resources account for
 $1,185.45, which resource tagging can address. Account-level data transfer

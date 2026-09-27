@@ -1,12 +1,11 @@
 {
   "rdsDBRecommendations": [
     {
-      "resourceArn": "arn:aws:rds:us-east-1:111122223333:db:orders-db",
+      "resourceArn": "arn:aws:rds:us-east-1:111122223333:cluster:orders-db",
       "accountId": "111122223333",
-      "engine": "mysql",
+      "engine": "aurora-postgresql",
       "currentDBInstanceClass": "db.r5.4xlarge",
       "multiAZ": true,
-      "allocatedStorageGiB": 1000,
       "instanceFinding": "Overprovisioned",
       "lookBackPeriodInDays": 14,
       "utilizationMetrics": [
@@ -26,12 +25,11 @@
       ]
     },
     {
-      "resourceArn": "arn:aws:rds:us-east-1:111122223333:db:reporting-db",
+      "resourceArn": "arn:aws:rds:us-east-1:111122223333:cluster:reporting-db",
       "accountId": "111122223333",
-      "engine": "mysql",
+      "engine": "aurora-postgresql",
       "currentDBInstanceClass": "db.r5.xlarge",
       "multiAZ": false,
-      "allocatedStorageGiB": 500,
       "instanceFinding": "Optimized",
       "lookBackPeriodInDays": 14,
       "utilizationMetrics": [
@@ -44,12 +42,11 @@
       "instanceRecommendationOptions": []
     },
     {
-      "resourceArn": "arn:aws:rds:us-east-1:444455556666:db:orders-db-stg",
+      "resourceArn": "arn:aws:rds:us-east-1:444455556666:cluster:orders-db-stg",
       "accountId": "444455556666",
-      "engine": "mysql",
+      "engine": "aurora-postgresql",
       "currentDBInstanceClass": "db.r5.2xlarge",
       "multiAZ": true,
-      "allocatedStorageGiB": 500,
       "instanceFinding": "Overprovisioned",
       "lookBackPeriodInDays": 14,
       "utilizationMetrics": [

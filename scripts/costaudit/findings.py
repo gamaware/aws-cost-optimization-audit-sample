@@ -233,44 +233,46 @@ def rightsize_ec2(ds: Dataset) -> Finding:
     return f
 
 
-def rds_target_cost(ds: Dataset, cls: str, multi_az: bool, storage_gb: Decimal) -> Decimal:
-    factor = 2 if multi_az else 1
-    instance = ds.hours * ds.price("rds_mysql_hourly_single_az", cls) * factor
-    storage = storage_gb * ds.price("rds_gp2_storage_gb_month", "multi_az" if multi_az else "single_az")
-    return instance + storage
+def rds_target_cost(ds: Dataset, cls: str, multi_az: bool) -> Decimal:
+    """Monthly on-demand instance cost of an Aurora cluster: a writer, plus a reader when Multi-AZ."""
+    instances = 2 if multi_az else 1
+    return ds.hours * ds.price("aurora_postgresql_hourly", cls) * instances
 
 
-def _az(multi_az: bool) -> str:
-    return "Multi-AZ" if multi_az else "Single-AZ"
+def aurora_layout(multi_az: bool) -> str:
+    return "writer and reader" if multi_az else "writer only"
 
 
 def rightsize_rds(ds: Dataset, environment: str) -> Finding:
-    costs = ds.cost_by_resource()
+    instance_cost: dict[str, Decimal] = {}
+    for ln in ds.current():
+        if ln.service == "AmazonRDS" and ln.usage_type.startswith("InstanceUsage:"):
+            instance_cost[ln.resource] = instance_cost.get(ln.resource, Decimal(0)) + ln.cost
     env_of = {ln.resource: ln.tag("environment") for ln in ds.current() if ln.service == "AmazonRDS"}
     title = {
         "prod": "Rightsize the production orders database",
-        "staging": "Rightsize the staging orders database and drop Multi-AZ",
+        "staging": "Rightsize the staging orders database and remove its reader",
     }[environment]
     f = Finding(
         f"rightsize-rds-{environment}",
         title,
         "rightsizing",
-        basis="Current instance and storage cost from the CUR; target uses the Compute Optimizer "
-        "rank-1 class and deployment at on-demand rates.",
+        basis="Current instance-hour cost from the CUR; target uses the Compute Optimizer rank-1 class and "
+        "deployment at on-demand rates. Aurora storage and I/O do not change with the instance class.",
     )
     for rec in ds.rds_recs:
         if rec["instanceFinding"] != "Overprovisioned" or env_of.get(rec["resourceArn"]) != environment:
             continue
         option = next(o for o in rec["instanceRecommendationOptions"] if o["rank"] == 1)
-        target = rds_target_cost(ds, option["dbInstanceClass"], option["multiAZ"], D(rec["allocatedStorageGiB"]))
+        target = rds_target_cost(ds, option["dbInstanceClass"], option["multiAZ"])
         name = rec["resourceArn"].rsplit(":", 1)[1]
         f.details.append(
             Detail(
                 rec["accountId"],
                 name,
-                f"{rec['currentDBInstanceClass']} {_az(rec['multiAZ'])} to "
-                f"{option['dbInstanceClass']} {_az(option['multiAZ'])}",
-                costs[rec["resourceArn"]],
+                f"{rec['currentDBInstanceClass']} {aurora_layout(rec['multiAZ'])} to "
+                f"{option['dbInstanceClass']} {aurora_layout(option['multiAZ'])}",
+                instance_cost[rec["resourceArn"]],
                 target,
             )
         )

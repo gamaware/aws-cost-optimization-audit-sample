@@ -41,9 +41,10 @@ RATE = {
         "t3.medium": "0.0416",
         "t3.large": "0.0832",
     },
-    "rds": {"db.r5.xlarge": "0.50", "db.r5.2xlarge": "1.00", "db.r5.4xlarge": "2.00"},
+    "rds": {"db.r5.xlarge": "0.58", "db.r5.2xlarge": "1.16", "db.r5.4xlarge": "2.32"},  # Aurora PostgreSQL
     "ebs": {"gp2": "0.10", "gp3": "0.08", "snapshot": "0.05"},
-    "rds_storage": {"single": "0.115", "multi": "0.23"},
+    "aurora_storage": "0.10",
+    "aurora_io": "0.0000002",  # per I/O request (0.20 per million)
     "cache.r5.large": "0.216",
     "redshift.ra3.xlplus": "1.086",
     "alb_hour": "0.0225",
@@ -272,11 +273,20 @@ NAT_GATEWAYS = [
     ],
 ]
 
-# RDS: (id, account, class, multi_az, storage GB, tags)
+# Aurora PostgreSQL clusters: (id, account, class, multi_az, storage GB, million I/O requests, tags).
+# Multi-AZ means a writer plus one reader of the same class in a second Availability Zone; storage is billed once.
 RDS = [
-    ("orders-db", PROD, "db.r5.4xlarge", True, 1000, tags("orders-db", "order-api", "prod", "digital")),
-    ("reporting-db", PROD, "db.r5.xlarge", False, 500, tags("reporting-db", "reporting", "prod", "finance")),
-    ("orders-db-stg", STAGING, "db.r5.2xlarge", True, 500, tags("orders-db-stg", "order-api", "staging", "digital")),
+    ("orders-db", PROD, "db.r5.4xlarge", True, 1000, 2000, tags("orders-db", "order-api", "prod", "digital")),
+    ("reporting-db", PROD, "db.r5.xlarge", False, 500, 300, tags("reporting-db", "reporting", "prod", "finance")),
+    (
+        "orders-db-stg",
+        STAGING,
+        "db.r5.2xlarge",
+        True,
+        500,
+        100,
+        tags("orders-db-stg", "order-api", "staging", "digital"),
+    ),
 ]
 
 # CloudWatch Logs groups: (name, account, class, retention days or None, ingest GB by period, stored GB by period, tags)
@@ -596,35 +606,46 @@ def build_cur() -> list[dict[str, str]]:
                     period, acct, "AmazonEC2", arn, "NatGateway-Bytes", "NatGateway", gb[p_index], RATE["nat_gb"], tag
                 )
             )
-        for db, acct, cls, multi, gb, tag in RDS:
-            arn = f"arn:aws:rds:{REGION}:{acct}:db:{db}"
-            factor = 2 if multi else 1
-            ut = f"{'Multi-AZUsage' if multi else 'InstanceUsage'}:{cls}"
+        for db, acct, cls, multi, gb, io_millions, tag in RDS:
+            arn = f"arn:aws:rds:{REGION}:{acct}:cluster:{db}"
+            instances_in_cluster = 2 if multi else 1
             rows.append(
                 usage_row(
                     period,
                     acct,
                     "AmazonRDS",
                     arn,
-                    ut,
-                    "CreateDBInstance:0002",
-                    HOURS,
-                    d(RATE["rds"][cls]) * factor,
+                    f"InstanceUsage:{cls}",
+                    "CreateDBInstance:0021",
+                    HOURS * instances_in_cluster,
+                    RATE["rds"][cls],
                     tag,
                     cls,
                 )
             )
-            st = "RDS:Multi-AZ-GP2-Storage" if multi else "RDS:GP2-Storage"
             rows.append(
                 usage_row(
                     period,
                     acct,
                     "AmazonRDS",
                     arn,
-                    st,
-                    "CreateDBInstance:0002",
+                    "Aurora:StorageUsage",
+                    "CreateDBInstance:0021",
                     gb,
-                    RATE["rds_storage"]["multi" if multi else "single"],
+                    RATE["aurora_storage"],
+                    tag,
+                )
+            )
+            rows.append(
+                usage_row(
+                    period,
+                    acct,
+                    "AmazonRDS",
+                    arn,
+                    "Aurora:StorageIOUsage",
+                    "CreateDBInstance:0021",
+                    io_millions * 1_000_000,
+                    RATE["aurora_io"],
                     tag,
                 )
             )
@@ -803,19 +824,18 @@ def compute_optimizer_rds() -> dict:
         "orders-db-stg": ("Overprovisioned", "6.0", {"dbInstanceClass": "db.r5.large", "multiAZ": False}, "LOW"),
     }
     recs = []
-    for db, acct, cls, multi, gb, _ in RDS:
+    for db, acct, cls, multi, _, _, _ in RDS:
         finding, cpu, target, risk = plan[db]
         options = []
         if target:
             options.append({**target, "rank": 1, "performanceRisk": risk})
         recs.append(
             {
-                "resourceArn": f"arn:aws:rds:{REGION}:{acct}:db:{db}",
+                "resourceArn": f"arn:aws:rds:{REGION}:{acct}:cluster:{db}",
                 "accountId": acct,
-                "engine": "mysql",
+                "engine": "aurora-postgresql",
                 "currentDBInstanceClass": cls,
                 "multiAZ": multi,
-                "allocatedStorageGiB": gb,
                 "instanceFinding": finding,
                 "lookBackPeriodInDays": 14,
                 "utilizationMetrics": [{"name": "CPU", "statistic": "MAXIMUM", "value": float(cpu)}],

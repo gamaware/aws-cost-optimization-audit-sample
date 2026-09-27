@@ -1,5 +1,5 @@
 {
-  "_about": "Every assumption the audit scripts use. Change a value here and re-run `make evidence` to see its effect on the report. Unit prices approximate us-east-1 on-demand list prices for Linux and MySQL; a real engagement reads them from the AWS Price List API.",
+  "_about": "Every assumption the audit scripts use. Change a value here and re-run `make evidence` to see its effect on the report. Unit prices approximate us-east-1 on-demand list prices for Linux and Aurora PostgreSQL; a real engagement reads them from the AWS Price List API.",
   "currency": "USD",
   "analysis_period": "M3",
   "trend_periods": [
@@ -18,15 +18,11 @@
       "t3.medium": "0.0416",
       "t3.large": "0.0832"
     },
-    "rds_mysql_hourly_single_az": {
-      "db.r5.large": "0.25",
-      "db.r5.xlarge": "0.50",
-      "db.r5.2xlarge": "1.00",
-      "db.r5.4xlarge": "2.00"
-    },
-    "rds_gp2_storage_gb_month": {
-      "single_az": "0.115",
-      "multi_az": "0.23"
+    "aurora_postgresql_hourly": {
+      "db.r5.large": "0.29",
+      "db.r5.xlarge": "0.58",
+      "db.r5.2xlarge": "1.16",
+      "db.r5.4xlarge": "2.32"
     },
     "ebs_gb_month": {
       "gp2": "0.10",
@@ -75,7 +71,7 @@
     "environments": [
       "prod"
     ],
-    "discount_source": "Planning figure, below typical published 1-year No Upfront rates for db.r5 MySQL. Confirm with the Price List API before purchase."
+    "discount_source": "Planning figure, below typical published 1-year No Upfront rates for db.r5 Aurora PostgreSQL. Confirm with the Price List API before purchase."
   },
   "cloudwatch_logs": {
     "retention_days_by_class": {
@@ -110,12 +106,12 @@
     "rightsize-rds-prod": {
       "effort": "Medium",
       "risk": "Medium",
-      "why": "Class change causes a Multi-AZ failover; schedule it in a maintenance window after a load test."
+      "why": "Resize the reader, fail over to it, then resize the old writer; schedule it in a maintenance window after a load test."
     },
     "rightsize-rds-staging": {
       "effort": "Low",
       "risk": "Low",
-      "why": "Staging only; a short outage during the modification is acceptable."
+      "why": "Staging only; the writer restarts during the class change, and a short outage is acceptable."
     },
     "schedule-staging": {
       "effort": "Low",

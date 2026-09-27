@@ -38,7 +38,7 @@ def test_every_finding_has_a_rating_with_a_reason(audit: Audit):
 
 def test_totals_add_up(audit: Audit):
     assert audit.monthly_total == audit.monthly_of("Quick win") + audit.monthly_of("Planned work")
-    assert audit.monthly_total == Decimal("7666.87")
+    assert audit.monthly_total == Decimal("8134.97")
     for r in audit.ranked:
         assert r.finding.annual == r.finding.monthly * 12
         assert r.finding.monthly > 0

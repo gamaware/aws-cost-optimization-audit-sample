@@ -173,8 +173,8 @@ The following instances form the baseline:
 **RDS Reserved Instances ({{rds-reserved-instances.id}}).** Current RDS coverage stands at
 {{rds_coverage}}. Once orders-db has been resized, reserve both production databases under
 one-year terms with no upfront payment. A {{rds_ri_discount}} discount supplies the planning
-estimate; verify the actual rate through the Price List API before purchase. RDS MySQL Reserved
-Instances support size flexibility within an instance family. Purchasing after resizing still
+estimate; verify the actual rate through the Price List API before purchase. Aurora PostgreSQL
+Reserved Instances support size flexibility within an instance family. Purchasing after resizing still
 aligns the commitment with the running resources.
 
 {{table:ri}}

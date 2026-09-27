@@ -14,23 +14,23 @@ using a fictional retailer's billing data, with all analysis performed offline.
 
 ## Executive summary
 
-Monthly AWS spending across Harbor Goods' three accounts totals $23,033.64, up 10.5% from two
+Monthly AWS spending across Harbor Goods' three accounts totals $24,070.34, up 10.0% from two
 months earlier. Across 16 opportunities, the audit estimates savings of
-**$7,666.87 a month ($92,002.44 a year)**, equivalent to 33.3% of the bill.
+**$8,134.97 a month ($97,619.64 a year)**, equivalent to 33.8% of the bill.
 
 | Group | Items | Estimated monthly saving |
 | --- | ---: | ---: |
-| Quick wins (low effort, low risk) | 10 | $3,742.22 |
-| Planned work (load test, release or commitment) | 6 | $3,924.65 |
-| **Total** | **16** | **$7,666.87** |
+| Quick wins (low effort, low risk) | 10 | $3,889.12 |
+| Planned work (load test, release or commitment) | 6 | $4,245.85 |
+| **Total** | **16** | **$8,134.97** |
 
 The three highest-ranked recommendations and their estimated monthly savings are:
 
-1. Rightsize the production orders database: $1,460.00 per month.
-2. Rightsize the staging orders database and drop Multi-AZ: $1,335.00 per month.
+1. Rightsize the production orders database: $1,693.60 per month.
+2. Rightsize the staging orders database and remove its reader: $1,481.90 per month.
 3. Rightsize over-provisioned EC2 instances: $840.96 per month.
 
-The `cost-center` tag covers just 78.1% of spending; Savings Plans cover 8.9% of eligible compute.
+The `cost-center` tag covers just 79.0% of spending; Savings Plans cover 8.9% of eligible compute.
 Alongside its tagging and allocation plan, the report calculates new commitment sizes from the
 usage that would remain after rightsizing.
 
@@ -50,7 +50,8 @@ usage that would remain after rightsizing.
 ## Scenario and acceptance criteria
 
 The fictional mid-size retailer Harbor Goods uses AWS for its storefront, order API, batch
-inventory synchronization, and small analytics warehouse. Production, staging, and shared services
+inventory synchronization, and small analytics warehouse. The orders database runs on Amazon Aurora
+PostgreSQL. Production, staging, and shared services
 each have an account. Bills have increased for three months without anyone owning the cost.
 Read-only access limits the audit to inspection; it makes no changes.
 

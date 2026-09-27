@@ -34,9 +34,9 @@ def raw_totals() -> dict[str, Decimal]:
 
 def test_period_totals():
     t = raw_totals()
-    assert money(t["M1"]) == d("20839.56")
-    assert money(t["M2"]) == d("22611.04")
-    assert money(t["M3"]) == d("23033.64")
+    assert money(t["M1"]) == d("21876.26")
+    assert money(t["M2"]) == d("23647.74")
+    assert money(t["M3"]) == d("24070.34")
 
 
 def test_loader_agrees_with_raw_csv(ds):
@@ -48,10 +48,10 @@ def test_loader_agrees_with_raw_csv(ds):
 EXPECTED = {
     # Six app instances, m5.2xlarge to m5.xlarge, full month.
     "rightsize-ec2": 6 * (d("0.384") - d("0.192")) * H,
-    # orders-db: db.r5.4xlarge to db.r5.2xlarge, both Multi-AZ (x2); storage unchanged.
-    "rightsize-rds-prod": (d("2.00") - d("1.00")) * 2 * H,
-    # orders-db-stg: db.r5.2xlarge Multi-AZ to db.r5.large Single-AZ, 500 GB storage Multi-AZ to Single-AZ.
-    "rightsize-rds-staging": (d("1.00") * 2 - d("0.25")) * H + 500 * (d("0.23") - d("0.115")),
+    # orders-db (Aurora PostgreSQL): writer and reader, db.r5.4xlarge to db.r5.2xlarge; storage and I/O unchanged.
+    "rightsize-rds-prod": (d("2.32") - d("1.16")) * 2 * H,
+    # orders-db-stg: writer and reader on db.r5.2xlarge to one db.r5.large writer; storage and I/O unchanged.
+    "rightsize-rds-staging": (d("1.16") * 2 - d("0.29")) * H,
     # Four staging instances at 0.384/h, from 730 to 12 x 5 x 52 / 12 = 260 hours.
     "schedule-staging": 4 * d("0.384") * (H - 12 * 5 * 52 / Decimal(12)),
     # gp2 1,000 + 500 + 500 + 250 GB at 0.10, gp3 2,000 GB at 0.08.
@@ -76,8 +76,8 @@ EXPECTED = {
     "s3-lifecycle": 20000 * (d("0.023") - d("0.004")) - 50 * d("0.03"),
     # Two of three staging NAT gateways, less 40 GB moved cross-AZ at 0.02.
     "nat-consolidation": 2 * H * d("0.045") - 40 * d("0.02"),
-    # Two production databases after resize: 2.00/h (Multi-AZ) + 0.50/h, 30% planning discount.
-    "rds-reserved-instances": (d("2.00") + d("0.50")) * H * d("0.30"),
+    # Production after resize: orders-db writer and reader at 2 x 1.16/h, reporting-db at 0.58/h, 30% discount.
+    "rds-reserved-instances": (d("1.16") * 2 + d("0.58")) * H * d("0.30"),
 }
 
 
