@@ -51,3 +51,25 @@ def test_pdf_was_built_from_the_committed_markdown():
 def test_movers_match_the_prose(audit):
     # The template explains the top three movers in this order.
     assert [s for s, _ in report.movers(audit)[:3]] == ["AmazonEC2", "AmazonCloudWatch", "AWSDataTransfer"]
+
+
+def test_readme_headline_figures_match_the_report(audit):
+    from costaudit import report as rpt
+
+    facts = rpt.facts(audit)
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    for key in (
+        "bill",
+        "bill_growth_pct",
+        "savings_monthly",
+        "savings_annual",
+        "savings_pct",
+        "quick_monthly",
+        "planned_monthly",
+        "top1.monthly",
+        "top2.monthly",
+        "top3.monthly",
+        "tag.cost-center",
+        "sp_coverage",
+    ):
+        assert facts[key] in readme, f"README is missing {key} = {facts[key]}"

@@ -18,4 +18,5 @@ releases are revisions of the report rather than SemVer releases of an API.
 
 ### To do
 
-- Re-pin the shared workflows in `.github/workflows/ci.yml` from `@main` to a reviewed commit SHA.
+- Re-pin the shared workflows in `.github/workflows/ci.yml` from `@main` to a reviewed commit SHA, then drop
+  the `gamaware/*` ref-pin policy from `zizmor.yml`.
