@@ -18,6 +18,7 @@
       "t3.medium": "0.0416",
       "t3.large": "0.0832"
     },
+    "aurora_postgresql_price_source": "db.r5 on-demand rates for Aurora PostgreSQL (Aurora Standard) match the AWS Price List API offer file for AmazonRDS in us-east-1, as do Aurora storage (0.10 per GB-month) and I/O (0.20 per million requests), which the rightsizing does not change.",
     "aurora_postgresql_hourly": {
       "db.r5.large": "0.29",
       "db.r5.xlarge": "0.58",

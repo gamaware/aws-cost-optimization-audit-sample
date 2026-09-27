@@ -615,7 +615,7 @@ def build_cur() -> list[dict[str, str]]:
                     acct,
                     "AmazonRDS",
                     arn,
-                    f"InstanceUsage:{cls}",
+                    f"InstanceUsage:{cls.replace('xlarge', 'xl')}",  # the CUR abbreviates, e.g. db.r5.2xl
                     "CreateDBInstance:0021",
                     HOURS * instances_in_cluster,
                     RATE["rds"][cls],
