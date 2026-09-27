@@ -1,0 +1,72 @@
+{
+  "rdsDBRecommendations": [
+    {
+      "resourceArn": "arn:aws:rds:us-east-1:111122223333:db:orders-db",
+      "accountId": "111122223333",
+      "engine": "mysql",
+      "currentDBInstanceClass": "db.r5.4xlarge",
+      "multiAZ": true,
+      "allocatedStorageGiB": 1000,
+      "instanceFinding": "Overprovisioned",
+      "lookBackPeriodInDays": 14,
+      "utilizationMetrics": [
+        {
+          "name": "CPU",
+          "statistic": "MAXIMUM",
+          "value": 22.0
+        }
+      ],
+      "instanceRecommendationOptions": [
+        {
+          "dbInstanceClass": "db.r5.2xlarge",
+          "multiAZ": true,
+          "rank": 1,
+          "performanceRisk": "LOW"
+        }
+      ]
+    },
+    {
+      "resourceArn": "arn:aws:rds:us-east-1:111122223333:db:reporting-db",
+      "accountId": "111122223333",
+      "engine": "mysql",
+      "currentDBInstanceClass": "db.r5.xlarge",
+      "multiAZ": false,
+      "allocatedStorageGiB": 500,
+      "instanceFinding": "Optimized",
+      "lookBackPeriodInDays": 14,
+      "utilizationMetrics": [
+        {
+          "name": "CPU",
+          "statistic": "MAXIMUM",
+          "value": 58.0
+        }
+      ],
+      "instanceRecommendationOptions": []
+    },
+    {
+      "resourceArn": "arn:aws:rds:us-east-1:444455556666:db:orders-db-stg",
+      "accountId": "444455556666",
+      "engine": "mysql",
+      "currentDBInstanceClass": "db.r5.2xlarge",
+      "multiAZ": true,
+      "allocatedStorageGiB": 500,
+      "instanceFinding": "Overprovisioned",
+      "lookBackPeriodInDays": 14,
+      "utilizationMetrics": [
+        {
+          "name": "CPU",
+          "statistic": "MAXIMUM",
+          "value": 6.0
+        }
+      ],
+      "instanceRecommendationOptions": [
+        {
+          "dbInstanceClass": "db.r5.large",
+          "multiAZ": false,
+          "rank": 1,
+          "performanceRisk": "LOW"
+        }
+      ]
+    }
+  ]
+}

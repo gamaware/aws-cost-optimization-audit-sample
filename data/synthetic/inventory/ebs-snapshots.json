@@ -1,0 +1,89 @@
+{
+  "Snapshots": [
+    {
+      "SnapshotId": "snap-0a1000000000000001",
+      "OwnerId": "111122223333",
+      "VolumeId": "vol-0a200000000000001",
+      "BilledSizeGiB": 120,
+      "AgeDays": 12,
+      "Tags": []
+    },
+    {
+      "SnapshotId": "snap-0a1000000000000002",
+      "OwnerId": "111122223333",
+      "VolumeId": "vol-0a200000000000001",
+      "BilledSizeGiB": 80,
+      "AgeDays": 40,
+      "Tags": []
+    },
+    {
+      "SnapshotId": "snap-0a1000000000000003",
+      "OwnerId": "111122223333",
+      "VolumeId": "vol-0a100000000000001",
+      "BilledSizeGiB": 60,
+      "AgeDays": 200,
+      "Tags": []
+    },
+    {
+      "SnapshotId": "snap-0a1000000000000004",
+      "OwnerId": "111122223333",
+      "VolumeId": "vol-0a9000000000000e1",
+      "BilledSizeGiB": 900,
+      "AgeDays": 420,
+      "Tags": []
+    },
+    {
+      "SnapshotId": "snap-0a1000000000000005",
+      "OwnerId": "111122223333",
+      "VolumeId": "vol-0a300000000000001",
+      "BilledSizeGiB": 700,
+      "AgeDays": 380,
+      "Tags": [
+        {
+          "Key": "retention",
+          "Value": "legal-hold"
+        }
+      ]
+    },
+    {
+      "SnapshotId": "snap-0a1000000000000006",
+      "OwnerId": "111122223333",
+      "VolumeId": "vol-0a300000000000002",
+      "BilledSizeGiB": 650,
+      "AgeDays": 610,
+      "Tags": []
+    },
+    {
+      "SnapshotId": "snap-0b1000000000000001",
+      "OwnerId": "444455556666",
+      "VolumeId": "vol-0b9000000000000e1",
+      "BilledSizeGiB": 400,
+      "AgeDays": 300,
+      "Tags": []
+    },
+    {
+      "SnapshotId": "snap-0b1000000000000002",
+      "OwnerId": "444455556666",
+      "VolumeId": "vol-0b100000000000001",
+      "BilledSizeGiB": 150,
+      "AgeDays": 30,
+      "Tags": []
+    },
+    {
+      "SnapshotId": "snap-0c1000000000000001",
+      "OwnerId": "123456789012",
+      "VolumeId": "vol-0c9000000000000e1",
+      "BilledSizeGiB": 500,
+      "AgeDays": 250,
+      "Tags": []
+    },
+    {
+      "SnapshotId": "snap-0c1000000000000002",
+      "OwnerId": "123456789012",
+      "VolumeId": "vol-0c100000000000001",
+      "BilledSizeGiB": 90,
+      "AgeDays": 190,
+      "Tags": []
+    }
+  ]
+}

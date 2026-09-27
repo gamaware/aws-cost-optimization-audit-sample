@@ -1,0 +1,14 @@
+{
+  "savingsPlans": [
+    {
+      "savingsPlanArn": "arn:aws:savingsplans::111122223333:savingsplan/0a0b0c0d-0000-4000-8000-000000000001",
+      "savingsPlanType": "Compute",
+      "paymentOption": "No Upfront",
+      "termDurationInSeconds": 31536000,
+      "commitment": "0.56",
+      "currency": "USD",
+      "state": "active",
+      "utilizationPercentage": "100.0"
+    }
+  ]
+}

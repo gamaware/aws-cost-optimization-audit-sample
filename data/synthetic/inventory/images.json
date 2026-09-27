@@ -1,0 +1,20 @@
+{
+  "Images": [
+    {
+      "ImageId": "ami-0a1000000000000001",
+      "Name": "harbor-goods-web-golden",
+      "OwnerId": "111122223333",
+      "SnapshotIds": [
+        "snap-0a1000000000000003"
+      ]
+    },
+    {
+      "ImageId": "ami-0c1000000000000001",
+      "Name": "harbor-goods-ci-runner",
+      "OwnerId": "123456789012",
+      "SnapshotIds": [
+        "snap-0c1000000000000002"
+      ]
+    }
+  ]
+}
