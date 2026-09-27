@@ -1,4 +1,4 @@
-# ADR 0004: Build the PDF from the Markdown with the shared pandoc LaTeX image
+# 0004. Build the PDF from the Markdown with the shared pandoc LaTeX image
 
 ## Status
 
@@ -27,15 +27,17 @@ this repository publishes.
   `ci.yml`; when the shared workflow changes its pin, or either copy of the arguments changes, the other follows.
 - PDF bytes differ between runs (timestamps), so the hash in the keywords, not the bytes, proves freshness.
 
-## Alternatives considered
-
-- **pandoc with Typst.** Byte-reproducible output, but a second engine next to the shared LaTeX job, so CI
-  produced two different PDFs. An earlier revision used it.
-- **Headless browser printing.** Needs a browser in CI, and its output varies between versions.
-
 ## Compliance
 
 - `make check` runs `scripts/build_pdf.py --check`, and
   `tests/test_report.py::test_pdf_was_built_from_the_committed_markdown` runs the same check.
 - The shared `report / pdf` check renders the Markdown with the same image and arguments and fails if the PDF is
   empty.
+
+## Notes
+
+Alternatives considered:
+
+- **pandoc with Typst.** Byte-reproducible output, but a second engine next to the shared LaTeX job, so CI
+  produced two different PDFs. An earlier revision used it.
+- **Headless browser printing.** Needs a browser in CI, and its output varies between versions.

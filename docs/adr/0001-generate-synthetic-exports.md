@@ -1,4 +1,4 @@
-# ADR 0001: Generate the synthetic exports from code
+# 0001. Generate the synthetic exports from code
 
 ## Status
 
@@ -27,14 +27,16 @@ dateless.
 - The data is plausible rather than real. Unit prices approximate us-east-1 list prices and are
   labelled as approximations.
 
-## Alternatives considered
-
-- **Hand-written fixtures.** Simpler to start with, but they drift out of step and are hard to review.
-- **Anonymised real exports.** Rejected: the risk of leaking a real identifier outweighs the realism.
-
 ## Compliance
 
 - `tests/test_data.py::test_generator_reproduces_committed_files` fails if a committed file differs
   from the generator's output. `make verify` also runs `generate_synthetic.py --check`.
 - `test_only_aws_documentation_account_ids` and `test_only_documentation_ip_addresses` scan `data/`.
 - `test_every_flagged_resource_is_billed` ties every recommendation to a CUR line.
+
+## Notes
+
+Alternatives considered:
+
+- **Hand-written fixtures.** Simpler to start with, but they drift out of step and are hard to review.
+- **Anonymised real exports.** Rejected: the risk of leaking a real identifier outweighs the realism.

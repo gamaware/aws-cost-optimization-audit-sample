@@ -1,4 +1,4 @@
-# ADR 0002: Render the report from a template with no hand-typed figures
+# 0002. Render the report from a template with no hand-typed figures
 
 ## Status
 
@@ -24,14 +24,16 @@ are twelve times the rounded monthly figure, and totals add the rounded values.
   it true.
 - Editing the report means editing the template, which is less direct than editing a document.
 
-## Alternatives considered
-
-- **A notebook.** Good for exploration, but hard to diff and review.
-- **A spreadsheet.** Familiar to finance teams, but formulas are hard to review and test in a pull request.
-
 ## Compliance
 
 - `tests/test_report.py::test_template_has_no_hand_typed_money_or_percentages` rejects literal figures
   in the template; a policy target such as the 95% tagging goal is the only allowed exception.
 - `test_committed_outputs_match_a_fresh_run` fails when `REPORT.md` or `evidence/` is stale.
 - `tests/test_numbers.py` recomputes each saving from first principles (hours x rate, GB x price).
+
+## Notes
+
+Alternatives considered:
+
+- **A notebook.** Good for exploration, but hard to diff and review.
+- **A spreadsheet.** Familiar to finance teams, but formulas are hard to review and test in a pull request.

@@ -1,4 +1,4 @@
-# ADR 0003: Size commitments last, on the steady post-change baseline
+# 0003. Size commitments last, on the steady post-change baseline
 
 ## Status
 
@@ -26,16 +26,18 @@ cover production databases after the resize, at a stated planning discount.
   With no existing plan, the code stops with an error rather than guessing.
 - The report tells the client to buy the commitments after rightsizing, not before.
 
-## Alternatives considered
-
-- **Use the Cost Explorer purchase recommendation directly.** It looks at past usage, so it does not
-  know about the rightsizing in this report.
-- **Commit to 100% of the baseline.** It saves more on paper, but leaves no headroom for the next round
-  of rightsizing or a move to Graviton.
-
 ## Compliance
 
 - `tests/test_numbers.py::test_compute_savings_plan_sizing` recomputes the baseline, commitment and saving.
 - `tests/test_ranking.py::test_commitment_baseline_excludes_changed_and_untagged_instances` checks the
   exclusions.
 - `scripts/costaudit/commitments.py::coverage` raises if the observed discount cannot be computed.
+
+## Notes
+
+Alternatives considered:
+
+- **Use the Cost Explorer purchase recommendation directly.** It looks at past usage, so it does not
+  know about the rightsizing in this report.
+- **Commit to 100% of the baseline.** It saves more on paper, but leaves no headroom for the next round
+  of rightsizing or a move to Graviton.
