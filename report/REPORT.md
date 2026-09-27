@@ -72,7 +72,7 @@ us-east-1 are also beyond scope.
 ## 3. Where the money goes
 
 | Service | M1 | M2 | M3 | Change M1 to M3 | Share of M3 |
-| --- | ---: | ---: | ---: | ---: | ---: |
+| -------------------------- | ------------: | ------------: | ------------: | -------------------: | -------------: |
 | Amazon EC2 (instances, EBS, NAT) | $6,385.67 | $7,758.95 | $7,785.95 | $1,400.28 (21.9%) | 33.8% |
 | Amazon RDS | $5,147.50 | $5,147.50 | $5,147.50 | $0.00 (0.0%) | 22.3% |
 | Amazon CloudFront | $2,380.00 | $2,465.00 | $2,550.00 | $170.00 (7.1%) | 11.1% |
@@ -94,7 +94,7 @@ Spending increased $2,194.08 across the billing window, with the largest changes
 The account breakdown follows:
 
 | Account | M1 | M2 | M3 | Change M1 to M3 | Share of M3 |
-| --- | ---: | ---: | ---: | ---: | ---: |
+| -------------------------------- | ------------: | ------------: | ------------: | ------------------: | -------------: |
 | `111122223333` (production) | $16,727.29 | $17,762.63 | $18,134.73 | $1,407.44 (8.4%) | 78.7% |
 | `444455556666` (staging) | $2,871.24 | $3,536.38 | $3,540.88 | $669.64 (23.3%) | 15.4% |
 | `123456789012` (shared services) | $1,241.03 | $1,312.03 | $1,358.03 | $117.00 (9.4%) | 5.9% |
@@ -106,7 +106,7 @@ Recommendation IDs remain unchanged when ranks move. `evidence/savings-detail.cs
 calculations for individual resources.
 
 | Rank | ID | Recommendation | Monthly | Annual | One-time cost | Effort | Risk | Type |
-| ---: | --- | --- | ---: | ---: | ---: | --- | --- | --- |
+| ------: | -------- | -------------------------- | -----------: | ------------: | ---------------: | -------- | -------- | -------------- |
 | 1 | SAV-02 | Rightsize the production orders database | $1,460.00 | $17,520.00 | none | Medium | Medium | Planned work |
 | 2 | SAV-03 | Rightsize the staging orders database and drop Multi-AZ | $1,335.00 | $16,020.00 | none | Low | Low | Quick win |
 | 3 | SAV-01 | Rightsize over-provisioned EC2 instances | $840.96 | $10,091.52 | none | Medium | Medium | Planned work |
@@ -132,7 +132,7 @@ work, following rank order within a single change window. Every item either supp
 reversal or retains a snapshot until validation confirms the change.
 
 | ID | Recommendation | Monthly | Why this effort and risk |
-| --- | --- | ---: | --- |
+| -------- | -------------------------- | -----------: | -------------------------- |
 | SAV-03 | Rightsize the staging orders database and drop Multi-AZ | $1,335.00 | Staging only; a short outage during the modification is acceptable. |
 | SAV-04 | Run staging order-api instances on a working-hours schedule | $721.92 | Instance Scheduler or an EventBridge schedule; staging is idle outside working hours. |
 | SAV-11 | Set CloudWatch Logs retention on groups that never expire | $539.55 | One setting per log group; export anything under a compliance hold first. |
@@ -155,7 +155,7 @@ reversal or retains a snapshot until validation confirms the change.
    staging NAT gateway consolidation (SAV-14) through the staging network code.
 
 | ID | Recommendation | Monthly | Why this effort and risk |
-| --- | --- | ---: | --- |
+| -------- | -------------------------- | -----------: | -------------------------- |
 | SAV-02 | Rightsize the production orders database | $1,460.00 | Class change causes a Multi-AZ failover; schedule it in a maintenance window after a load test. |
 | SAV-01 | Rightsize over-provisioned EC2 instances | $840.96 | Instance type change needs a rolling replacement and a load test on memory headroom. |
 | SAV-15 | Buy a one-year Compute Savings Plan for the steady EC2 baseline | $651.29 | A one-year commitment; buy it after rightsizing so it does not lock in oversized usage. |
@@ -173,7 +173,7 @@ rule: snapshots must exceed 180 days in age, have no AMI reference and carry no
 snapshots backing AMIs.
 
 | ID | Account | Resource | Detail | Current/mo | Target/mo | Saving/mo |
-| --- | --- | --- | --- | ---: | ---: | ---: |
+| -------- | -------------- | ----------------------------- | -------------------------- | ------------: | -----------: | -----------: |
 | SAV-05 | `111122223333` | `vol-0a9000000000000e1` | gp2, 1,000 GiB, left over from the app fleet rebuild | $100.00 | $0.00 | $100.00 |
 | SAV-05 | `111122223333` | `vol-0a9000000000000e2` | gp2, 500 GiB, detached test restore | $50.00 | $0.00 | $50.00 |
 | SAV-05 | `444455556666` | `vol-0b9000000000000e1` | gp2, 500 GiB, old staging database volume | $50.00 | $0.00 | $50.00 |
@@ -206,7 +206,7 @@ recommendation schedules 260 running hours per month while retaining their
 current instance type.
 
 | ID | Account | Resource | Detail | Current/mo | Target/mo | Saving/mo |
-| --- | --- | --- | --- | ---: | ---: | ---: |
+| -------- | -------------- | --------------------- | -------------------------- | ------------: | -----------: | -----------: |
 | SAV-01 | `111122223333` | `i-0a200000000000001` | app-01: m5.2xlarge to m5.xlarge (max CPU 17%, max memory 34%) | $280.32 | $140.16 | $140.16 |
 | SAV-01 | `111122223333` | `i-0a200000000000002` | app-02: m5.2xlarge to m5.xlarge (max CPU 17%, max memory 34%) | $280.32 | $140.16 | $140.16 |
 | SAV-01 | `111122223333` | `i-0a200000000000003` | app-03: m5.2xlarge to m5.xlarge (max CPU 17%, max memory 34%) | $280.32 | $140.16 | $140.16 |
@@ -224,7 +224,7 @@ The remaining fleets have approximately appropriate capacity; the table shows th
 in each. Load tests drive staging CPU to 65%, supporting its current instance size.
 
 | Resource | Current type | Compute Optimizer finding | Max CPU | Max memory |
-| --- | --- | --- | ---: | ---: |
+| -------------- | -------------- | --------------------------- | ---------: | ------------: |
 | web-01 | m5.xlarge | Optimized | 41% | 58% |
 | batch-01 | c5.4xlarge | Optimized | 88% | 61% |
 | stg-app-01 | m5.2xlarge | Optimized | 65% | 48% |
@@ -235,7 +235,7 @@ in each. Load tests drive staging CPU to 65%, supporting its current instance si
 CUR line types establish the following coverage for M3:
 
 | Measure | Value |
-| --- | ---: |
+| -------------------------- | -----------: |
 | Savings Plans eligible on-demand spend (M3) | $6,319.89 |
 | Covered by the existing Compute Savings Plan | $560.64 |
 | Savings Plans coverage | 8.9% |
@@ -257,7 +257,7 @@ For the proposed Compute Savings Plan (SAV-15), sizing follows these criteria:
 - Round down the hourly commitment to a valid purchase increment.
 
 | Step | Value |
-| --- | ---: |
+| -------------------------- | -----------: |
 | Steady post-change baseline (14 instances, on-demand per hour) | $4.1192 |
 | Target covered on-demand per hour | $3.2954 |
 | Commitment per hour (rounded down) | $2.4020 |
@@ -271,7 +271,7 @@ existing and proposed plans would cover 64.0% of that spending.
 The following instances form the baseline:
 
 | Account | Instance | Sized as | On-demand per hour |
-| --- | --- | --- | ---: |
+| -------------- | --------------------- | ------------ | --------------------: |
 | `111122223333` | `i-0a200000000000001` | m5.xlarge | $0.1920 |
 | `111122223333` | `i-0a200000000000002` | m5.xlarge | $0.1920 |
 | `111122223333` | `i-0a200000000000003` | m5.xlarge | $0.1920 |
@@ -295,7 +295,7 @@ Instances support size flexibility within an instance family. Purchasing after r
 aligns the commitment with the running resources.
 
 | ID | Account | Resource | Detail | Current/mo | Target/mo | Saving/mo |
-| --- | --- | --- | --- | ---: | ---: | ---: |
+| -------- | -------------- | -------------- | ------------------------ | ------------: | -----------: | -----------: |
 | SAV-16 | `111122223333` | `orders-db` | db.r5.2xlarge Multi-AZ | $1,460.00 | $1,022.00 | $438.00 |
 | SAV-16 | `111122223333` | `reporting-db` | db.r5.xlarge Single-AZ | $365.00 | $255.50 | $109.50 |
 
@@ -305,7 +305,7 @@ for the decision and purchase.
 ## 8. Storage, logs and network
 
 | ID | Account | Resource | Detail | Current/mo | Target/mo | Saving/mo |
-| --- | --- | --- | --- | ---: | ---: | ---: |
+| -------- | -------------- | ----------------------------- | -------------------------- | ------------: | -----------: | -----------: |
 | SAV-11 | `111122223333` | `/harbor-goods/order-api` | application, never expires to 30 days, 9,000 GB stored to 360 GB | $270.00 | $10.80 | $259.20 |
 | SAV-11 | `111122223333` | `/harbor-goods/storefront` | application, never expires to 30 days, 3,600 GB stored to 90 GB | $108.00 | $2.70 | $105.30 |
 | SAV-11 | `111122223333` | `/harbor-goods/vpc-flow` | network, never expires to 180 days, 4,800 GB stored to 720 GB | $144.00 | $21.60 | $122.40 |
@@ -341,7 +341,7 @@ for the decision and purchase.
 ## 9. Tagging and cost allocation
 
 | Required tag | Share of M3 cost tagged | Untagged cost |
-| --- | ---: | ---: |
+| -------------- | -------------------------: | ---------------: |
 | `application` | 89.2% | $2,494.25 |
 | `environment` | 87.8% | $2,809.61 |
 | `cost-center` | 78.1% | $5,044.25 |
@@ -355,7 +355,7 @@ allocation rules.
 The highest-cost resources without tags appear below:
 
 | Account | Service | Resource | M3 cost |
-| --- | --- | --- | ---: |
+| -------------- | -------------------------- | ----------------------------- | ---------: |
 | `444455556666` | Amazon EC2 (instances, EBS, NAT) | `i-0b200000000000001` | $248.20 |
 | `123456789012` | Amazon EC2 (instances, EBS, NAT) | `vol-0c9000000000000e1` | $160.00 |
 | `444455556666` | Amazon CloudWatch | `/harbor-goods/order-api-stg` | $129.00 |
@@ -387,7 +387,7 @@ The recommended allocation controls are:
 recalculates its impact throughout the report.
 
 | Assumption | Value | Used by |
-| --- | ---: | --- |
+| -------------------------- | --------------------------: | --------- |
 | Hours in a month | 730 | all |
 | Staging schedule | 12 h x 5 days = 260 h/month | SAV-04 |
 | Snapshot age threshold | 180 days | SAV-07 |

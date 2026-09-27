@@ -7,7 +7,7 @@ Project instructions for Claude Code. The global `~/.claude/CLAUDE.md` rules app
 A fictional sample deliverable: an offline AWS cost optimization audit of "Harbor Goods". Synthetic
 exports in `data/synthetic/` feed Python scripts in `scripts/costaudit/`, which write `evidence/` and
 render `report/REPORT.md` from `report/REPORT.template.md`. `scripts/build_pdf.py` turns the report
-into `report/REPORT.pdf` with pandoc and Typst.
+into `report/REPORT.pdf` with the shared pandoc LaTeX image (Docker).
 
 ## Structure
 
@@ -21,7 +21,7 @@ into `report/REPORT.pdf` with pandoc and Typst.
 ## Commands
 
 - `make verify`: lint, tests, and freshness of data, evidence, report and PDF. Offline.
-- `make data`, `make evidence`, `make pdf`: regenerate outputs (`pdf` needs pandoc).
+- `make data`, `make evidence`, `make pdf`: regenerate outputs (`pdf` needs Docker).
 - `make test-live`: read-only exporter smoke test against the `dev` profile. Manual only; never in CI.
 
 ## Rules

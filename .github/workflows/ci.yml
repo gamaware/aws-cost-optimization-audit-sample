@@ -1,6 +1,6 @@
 # Thin caller: shared checks come from gamaware/.github; repo checks run the same `make verify` as
 # a local run. No job gets cloud credentials or an id-token.
-name: CI
+name: ci
 
 on:
   pull_request:
@@ -10,36 +10,42 @@ on:
 permissions: {}
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   lint-docs:
-    uses: gamaware/.github/.github/workflows/lint-docs.yml@1255caafb08b06cc4658318c4dd48f9dea946c9e # gamaware/.github PR #1 head; re-pin after merge
+    name: lint-docs
+    uses: gamaware/.github/.github/workflows/lint-docs.yml@1255caafb08b06cc4658318c4dd48f9dea946c9e # gamaware/.github initial workflows
     permissions:
       contents: read
 
   lint-actions:
-    uses: gamaware/.github/.github/workflows/lint-actions.yml@1255caafb08b06cc4658318c4dd48f9dea946c9e # gamaware/.github PR #1 head; re-pin after merge
+    name: lint-actions
+    uses: gamaware/.github/.github/workflows/lint-actions.yml@1255caafb08b06cc4658318c4dd48f9dea946c9e # gamaware/.github initial workflows
     permissions:
       contents: read
 
   secrets:
-    uses: gamaware/.github/.github/workflows/secrets.yml@1255caafb08b06cc4658318c4dd48f9dea946c9e # gamaware/.github PR #1 head; re-pin after merge
+    name: secrets
+    uses: gamaware/.github/.github/workflows/secrets.yml@1255caafb08b06cc4658318c4dd48f9dea946c9e # gamaware/.github initial workflows
     permissions:
       contents: read
 
   security:
-    uses: gamaware/.github/.github/workflows/security.yml@1255caafb08b06cc4658318c4dd48f9dea946c9e # gamaware/.github PR #1 head; re-pin after merge
+    name: security
+    uses: gamaware/.github/.github/workflows/security.yml@1255caafb08b06cc4658318c4dd48f9dea946c9e # gamaware/.github initial workflows
     permissions:
       contents: read
 
   report:
-    uses: gamaware/.github/.github/workflows/report.yml@1255caafb08b06cc4658318c4dd48f9dea946c9e # gamaware/.github PR #1 head; re-pin after merge
+    name: report
+    uses: gamaware/.github/.github/workflows/report.yml@1255caafb08b06cc4658318c4dd48f9dea946c9e # gamaware/.github initial workflows
     permissions:
       contents: read
     with:
-      artifact-name: harbor-goods-report-latex
+      # Same arguments as scripts/build_pdf.py, so the artifact matches the committed PDF.
+      pandoc-args: --pdf-engine=xelatex -V papersize=a4 -V geometry:margin=1.8cm -V geometry:landscape --toc
       evidence-command: >-
         python -m pip install --quiet uv==0.12.19 &&
         uv sync --frozen &&
@@ -47,7 +53,7 @@ jobs:
       evidence-path: evidence
 
   verify:
-    name: make verify
+    name: verify
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
@@ -61,40 +67,3 @@ jobs:
           enable-cache: false
       - run: uv sync --frozen
       - run: make verify
-
-  report-typst:
-    name: report PDF (Typst, committed)
-    needs: verify
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    permissions:
-      contents: read
-    env:
-      PANDOC_VERSION: "3.11"
-      PANDOC_SHA256: 89d4c9d97818c62a97157f0072844e4602c6cee795bf84abd1aee7273abcda99
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
-        with:
-          enable-cache: false
-      - name: Install pinned pandoc
-        run: |
-          deb="pandoc-${PANDOC_VERSION}-1-amd64.deb"
-          curl -sSfL -o "$RUNNER_TEMP/$deb" "https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/$deb"
-          echo "${PANDOC_SHA256}  $RUNNER_TEMP/$deb" | sha256sum --check
-          sudo dpkg -i "$RUNNER_TEMP/$deb"
-      - run: uv sync --frozen
-      - name: Rebuild evidence, report and PDF, then require no diff
-        run: |
-          make evidence
-          git diff --exit-code -- evidence report
-          test -z "$(git status --porcelain -- evidence report)"
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: harbor-goods-cost-audit-report
-          path: |
-            report/REPORT.md
-            report/REPORT.pdf
-          retention-days: 30

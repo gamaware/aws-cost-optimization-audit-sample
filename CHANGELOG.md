@@ -16,10 +16,5 @@ releases are revisions of the report rather than SemVer releases of an API.
 - Tests that recompute every figure in the report from the data.
 - ADRs, methodology, diagrams and a read-only `make test-live` smoke test.
 - CI calls the shared `gamaware/.github` workflows pinned to a commit SHA, including the shared report
-  evidence check.
+  evidence check and PDF render, plus an OpenSSF Scorecard workflow.
 - Social preview (`docs/assets/social-preview.png`) rendered with the shared generator.
-
-### To do
-
-- The shared workflows are pinned to the head of gamaware/.github PR #1. A squash merge creates a new
-  commit, so re-pin `.github/workflows/ci.yml` to the merged `main` SHA.

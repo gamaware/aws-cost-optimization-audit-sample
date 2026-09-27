@@ -1,19 +1,23 @@
 #!/usr/bin/env python3
 """Render report/REPORT.md to report/REPORT.pdf, or check that the PDF is current.
 
-    python scripts/build_pdf.py          # build: pandoc (Markdown to Typst), then Typst to PDF
+    python scripts/build_pdf.py          # build: pandoc with LaTeX, in the shared report workflow's image
     python scripts/build_pdf.py --check  # fail if REPORT.pdf was not built from the current REPORT.md
 
+The build runs the same pinned pandoc/latex image and arguments as the shared `report` workflow in
+gamaware/.github, with the arguments ci.yml passes to it, so the committed PDF and the CI artifact
+come from one engine. It needs Docker.
+
 The SHA-256 of REPORT.md is written into the PDF keywords. The check compares
-that value with the Markdown on disk, so it needs neither pandoc nor Typst and
-does not depend on byte-identical PDF output across tool versions.
+that value with the Markdown on disk, so it needs neither Docker nor pandoc and
+does not depend on byte-identical PDF output across runs.
 """
 
 from __future__ import annotations
 
 import argparse
 import hashlib
-import re
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -22,84 +26,43 @@ ROOT = Path(__file__).resolve().parent.parent
 SOURCE = ROOT / "report" / "REPORT.md"
 TARGET = ROOT / "report" / "REPORT.pdf"
 KEY_PREFIX = "report-md-sha256:"
-TABLE_STYLE = """#set table(
-  inset: 4pt,
-  fill: (_, y) => if y == 0 { luma(232) },
-  stroke: (_, y) => (bottom: if y == 0 { 0.6pt } else { 0.3pt + luma(200) }),
-)
-#show table.cell.where(y: 0): strong
-#show table: set text(size: 7.5pt)
-#show table: set par(justify: false)
-"""
+# Keep in step with PANDOC_IMAGE in gamaware/.github report.yml and the pandoc-args in .github/workflows/ci.yml.
+# Landscape A4 gives the seven-column detail tables room for resource IDs, which cannot wrap.
+PANDOC_IMAGE = "pandoc/latex:3.11@sha256:cdbf139f607237498b412b3aa051008311d69b88006ab47550efba357af3b277"
+PANDOC_ARGS = [
+    "--pdf-engine=xelatex",
+    "-V",
+    "papersize=a4",
+    "-V",
+    "geometry:margin=1.8cm",
+    "-V",
+    "geometry:landscape",
+    "--toc",
+]
 
 
 def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def column_specs(markdown: str) -> list[str]:
-    """One Typst `columns:` value per Markdown table.
-
-    Short columns and identifier columns (all code spans, which cannot wrap) fit their content;
-    long prose columns share the remaining width in proportion to their longest cell.
-    """
-    specs: list[str] = []
-    widths: list[int] | None = None
-    fixed: list[bool] = []
-    for line in [*markdown.splitlines(), ""]:
-        if line.startswith("|"):
-            cells = re.split(r"\s*\|\s*", line.strip()[1:-1].strip())
-            if all(set(c) <= set("-: ") for c in cells):
-                continue  # separator row
-            lengths = [len(c.replace("`", "").replace("**", "")) for c in cells]
-            code = [c == "" or (c.startswith("`") and c.endswith("`")) for c in cells]
-            if widths is None:  # header row: its text does not decide the width
-                widths, fixed = [0] * len(cells), [True] * len(cells)
-                continue
-            widths = [max(a, b) for a, b in zip(widths, lengths, strict=True)]
-            fixed = [a and b for a, b in zip(fixed, code, strict=True)]
-        elif widths is not None:
-            cols = ["auto" if f or w <= 16 else f"{min(w, 90) // 10 + 1}fr" for w, f in zip(widths, fixed, strict=True)]
-            specs.append("(" + ", ".join(cols) + ",)")
-            widths = None
-    return specs
-
-
-def size_columns(typ: str, markdown: str) -> str:
-    specs = iter(column_specs(markdown))
-    return re.sub(r"columns: \d+,", lambda _: f"columns: {next(specs)},", typ)
-
-
 def build() -> int:
-    import typst  # dev dependency, imported here so --check works without it
-
-    text = SOURCE.read_text(encoding="utf-8")
-    first, _, body = text.partition("\n")
-    if not first.startswith("# "):
-        print(f"{SOURCE} must start with a level-1 title", file=sys.stderr)
-        return 1
     cmd = [
-        "pandoc",
-        "--from=gfm",
-        "--to=typst",
-        "--standalone",
-        f"--metadata=title:{first[2:].strip()}",
+        "docker",
+        "run",
+        "--rm",
+        "--platform=linux/amd64",
+        f"--user={os.getuid()}:{os.getgid()}",
+        "--env=HOME=/tmp",
+        f"--volume={ROOT}:/data",
+        "--workdir=/data/report",
+        PANDOC_IMAGE,
+        SOURCE.name,
+        *PANDOC_ARGS,
         f"--metadata=keywords:{KEY_PREFIX}{digest(SOURCE)}",
-        "--variable=papersize:a4",
-        "--variable=margin.x:1.4cm",
-        "--variable=margin.y:1.8cm",
-        "--variable=fontsize:9pt",
+        f"--output={TARGET.name}",
     ]
-    typ = subprocess.run(cmd, input=body, capture_output=True, text=True, check=True).stdout
-    # No creation date in the PDF, so the same Markdown gives byte-identical output.
-    typ = "#set document(date: none)\n" + typ
-    # Left-align tables and give them a shaded header row and light row rules.
-    typ = typ.replace("align(center)[#table(", "align(left)[#table(")
-    typ = typ.replace("#show: doc => conf(", TABLE_STYLE + "#show: doc => conf(", 1)
-    typ = size_columns(typ, body)
-    pdf = typst.compile(typ.encode("utf-8"), root=str(ROOT), ignore_system_fonts=True)
-    TARGET.write_bytes(pdf)
-    print(f"wrote {TARGET.relative_to(ROOT)} ({len(pdf):,} bytes)")
+    subprocess.run(cmd, check=True)
+    print(f"wrote {TARGET.relative_to(ROOT)} ({TARGET.stat().st_size:,} bytes)")
     return 0
 
 

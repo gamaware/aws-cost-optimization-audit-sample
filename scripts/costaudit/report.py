@@ -38,7 +38,16 @@ TOP_SERVICES = 6
 
 def _table(header: list[str], rows: list[list[str]], align: list[str] | None = None) -> str:
     align = align or ["l"] * len(header)
-    sep = ["---:" if a == "r" else "---" for a in align]
+    # pandoc sizes wide pipe tables by the dash count of each separator cell. Single-word cells (IDs, amounts,
+    # code spans) cannot wrap in the PDF, so their columns get their full length; prose columns share the rest,
+    # capped so that no column takes over. The + 2 covers cell padding.
+    widths = []
+    for i in range(len(header)):
+        cells = [header[i]] + [r[i] for r in rows if r[i]]
+        lengths = [len(c.replace("`", "").replace("**", "")) for c in cells]
+        nowrap = all(" " not in c.replace("**", "") or c.startswith("`") for c in cells[1:])
+        widths.append((max(lengths) if nowrap else min(max(lengths), 24)) + 2)
+    sep = [("-" * w + ":") if a == "r" else "-" * w for w, a in zip(widths, align, strict=True)]
 
     def line(cells: list[str]) -> str:
         return "|" + "|".join(f" {c} " if c else " " for c in cells) + "|"

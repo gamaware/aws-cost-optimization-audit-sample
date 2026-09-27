@@ -80,7 +80,7 @@ the data causes it to fail. The editable diagram is available at
 
 Local verification requires GNU Make and [uv](https://docs.astral.sh/uv/) 0.8 or later. uv installs
 Python 3.12+ along with the tools pinned in `uv.lock`. Rebuilding the PDF additionally requires
-[pandoc](https://pandoc.org/) 3.11, the version CI pins.
+Docker: `make pdf` runs the same pinned pandoc LaTeX image as CI.
 
 ```sh
 uv sync --frozen
@@ -126,7 +126,7 @@ docs/                  methodology, ADRs, diagrams, cover image
 | [0001](docs/adr/0001-generate-synthetic-exports.md) | Generate the synthetic exports from code | Accepted |
 | [0002](docs/adr/0002-render-report-from-template.md) | Render the report from a template with no hand-typed figures | Accepted |
 | [0003](docs/adr/0003-size-commitments-last.md) | Size commitments last, on the steady post-change baseline | Accepted |
-| [0004](docs/adr/0004-pdf-from-markdown.md) | Build the PDF from the Markdown with pandoc and Typst | Accepted |
+| [0004](docs/adr/0004-pdf-from-markdown.md) | Build the PDF from the Markdown with the shared pandoc LaTeX image | Accepted |
 
 ## Security and quality gates
 
@@ -138,8 +138,8 @@ docs/                  methodology, ADRs, diagrams, cover image
 | actionlint, zizmor | pre-commit and shared `lint-actions` workflow | Safe workflows: SHA pins, least privilege |
 | gitleaks, detect-secrets | pre-commit and shared `secrets` workflow | No credentials in a public repo |
 | Semgrep, Trivy, Checkov | shared `security` workflow | Code, dependency and configuration scanning |
-| Evidence regeneration, plus a LaTeX PDF artifact | shared `report` workflow | Evidence reproduces from the committed scripts |
-| Rebuild of evidence, report and PDF with pinned pandoc | CI `report-typst` job | The committed PDF matches the reviewed Markdown |
+| Evidence regeneration and PDF render with the pinned pandoc LaTeX image | shared `report` workflow | Evidence reproduces from the committed scripts; the report renders |
+| Hash of `REPORT.md` in the PDF keywords | `make verify` | The committed PDF was built from the reviewed Markdown |
 
 Workflow-level `permissions: {}` applies to the CI jobs, which use no cloud credentials.
 

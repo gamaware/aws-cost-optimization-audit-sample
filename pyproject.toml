@@ -10,7 +10,6 @@ dependencies = []
 dev = [
     "pytest==9.1.1",
     "ruff==0.16.9",
-    "typst==0.15.0",
     "pypdf==6.19.0",
 ]
 

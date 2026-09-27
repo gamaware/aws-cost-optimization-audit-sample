@@ -29,12 +29,12 @@ check:
 data:
 	$(RUN) python scripts/generate_synthetic.py
 
-## evidence: regenerate evidence/, report/REPORT.md and report/REPORT.pdf (needs pandoc)
+## evidence: regenerate evidence/, report/REPORT.md and report/REPORT.pdf (needs Docker)
 evidence:
 	$(PY) -m costaudit build
 	$(MAKE) pdf
 
-## pdf: render report/REPORT.pdf from report/REPORT.md (needs pandoc)
+## pdf: render report/REPORT.pdf from report/REPORT.md (needs Docker)
 pdf:
 	$(RUN) python scripts/build_pdf.py
 
