@@ -1,0 +1,25 @@
+language: en-US
+reviews:
+  auto_review:
+    enabled: true
+    drafts: false
+  path_instructions:
+    - path: "scripts/**/*.py"
+      instructions: >-
+        Money is Decimal end to end; flag any float in a cost calculation. Current costs must come
+        from the CUR extract and target costs from data/assumptions.json, never hard-coded.
+    - path: "report/REPORT.template.md"
+      instructions: >-
+        Every dollar amount and percentage must be a {{ placeholder }}; hand-typed figures fail the
+        tests. Savings must be described as estimates on fictional data.
+    - path: "data/**"
+      instructions: >-
+        Only AWS documentation example account IDs (111122223333, 444455556666, 123456789012) and
+        RFC 5737 addresses. data/synthetic is generated; changes belong in scripts/generate_synthetic.py.
+    - path: "**/*.sh"
+      instructions: >-
+        Must pass shellcheck and shellharden, quote every variable, and never create AWS resources
+        without a purpose=portfolio-test tag and a trap-based cleanup.
+    - path: "**/*.md"
+      instructions: >-
+        Line length 120 (tables exempt), sentence-case headings, no marketing adjectives, dateless.
