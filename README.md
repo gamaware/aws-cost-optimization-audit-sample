@@ -1,16 +1,16 @@
 # AWS cost optimization audit sample
 
-An AWS cost optimization audit with ranked savings and a clear action plan
-using a fictional retailer's billing data, with all analysis performed offline.
+An offline AWS cost audit of a fictional retailer's billing data, with ranked savings and an action plan.
 
 [![CI](https://github.com/gamaware/aws-cost-optimization-audit-sample/actions/workflows/ci.yml/badge.svg)](https://github.com/gamaware/aws-cost-optimization-audit-sample/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![Fictional sample](https://img.shields.io/badge/data-fictional%20sample-lightgrey.svg)
+![Fictional sample](https://img.shields.io/badge/fictional-sample-5b6b7f)
 
-![AWS cost optimization audit: ranked savings and a clear action plan](docs/assets/cover.png)
+![AWS cost optimization audit](docs/assets/cover.png)
 
-> **Fictional sample.** All data in this repository is synthetic, and Harbor Goods does not represent
-> a real company. Savings are estimates calculated from that data; none are measured results.
+> **Fictional sample.** Harbor Goods and all data here are fictional. Each repository in this portfolio is a
+> separate engagement with Harbor Goods, a fictional mid-size retailer. Account IDs are AWS documentation examples.
+> Savings are estimates calculated from that data; none are measured results.
 
 ## Executive summary
 
@@ -67,7 +67,7 @@ Acceptance requires the following:
 
 ## Architecture
 
-![Context view: AWS exports feed offline audit scripts, evidence, report and tests](docs/diagrams/audit-context.drawio.png)
+![Context view: AWS exports feed offline audit scripts, evidence, report and tests](docs/diagrams/audit-context.png)
 
 A deterministic generator creates billing lines, Compute Optimizer findings, and Trusted Advisor
 checks for the three fictional accounts, representing exports an auditor would collect through
@@ -79,8 +79,8 @@ the data causes it to fail. The editable diagram is available at
 
 ## Verify locally
 
-Local verification requires GNU Make and [uv](https://docs.astral.sh/uv/) 0.8 or later. uv installs
-Python 3.12+ along with the tools pinned in `uv.lock`. Rebuilding the PDF additionally requires
+Local verification requires GNU Make and [uv](https://docs.astral.sh/uv/) 0.12 or later (CI pins 0.12.19).
+uv installs Python 3.13 along with the tools pinned in `uv.lock`. Rebuilding the PDF additionally requires
 Docker: `make pdf` runs the same pinned pandoc LaTeX image as CI.
 
 ```sh
@@ -94,6 +94,7 @@ The final lines of a successful run are:
 data/synthetic matches the generator
 evidence/ and report/REPORT.md match a fresh run of the audit
 report/REPORT.pdf matches report/REPORT.md
+verify: all checks passed
 ```
 
 After the initial `uv sync`, verification finishes in less than a minute. To print the ranking,
@@ -155,16 +156,17 @@ Workflow-level `permissions: {}` applies to the CI jobs, which use no cloud cred
   containers, and data transfer architecture.
 - **A real engagement adds:** read-only collection of exports and pricing from the Price List API.
   A readout with the client's engineers confirms effort and risk ratings. The Advanced tier of the
-  matching service offer also includes infrastructure-as-code pull requests for the top changes and a follow-up cost report.
+  matching service offer also includes infrastructure-as-code pull requests for the top changes and a
+  follow-up cost report.
 
 ## Related work
 
-- Browse the portfolio at [aws-devops-portfolio](https://github.com/gamaware/aws-devops-portfolio).
-- Alex Garcia's Upwork profile lists the corresponding "AWS cost optimization audit" service.
-  This sample follows Alex's audit method for ITESO and freelance clients in Guadalajara;
-  the fictional dataset is the source of every finding presented here.
-- See the [change history](CHANGELOG.md) and [security policy](SECURITY.md). Contribution and
-  support guidance is available in [gamaware/.github](https://github.com/gamaware/.github).
+Part of the [AWS DevOps portfolio](https://github.com/gamaware/aws-devops-portfolio); it backs the "AWS cost
+optimization audit" service:
+[AWS cost optimization audit on Upwork](https://www.upwork.com/freelancers/~014b3520cf9e140103). The method is the
+one Alex uses in audits for ITESO and freelance clients in Guadalajara. Contribution, conduct and support guidelines
+are inherited from [gamaware/.github](https://github.com/gamaware/.github); see also [SECURITY.md](SECURITY.md) and
+[CHANGELOG.md](CHANGELOG.md).
 
 ## License
 

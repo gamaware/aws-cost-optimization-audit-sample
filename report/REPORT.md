@@ -2,9 +2,10 @@
 
 <!-- `make evidence` generates this file from report/REPORT.template.md. Make edits in the template. -->
 
-> **Fictional sample.** Harbor Goods is an invented retailer. This repository uses synthetic billing
-> records, recommendations and inventories; all savings figures estimate outcomes from those
-> fictional inputs. The report represents neither an actual company nor measured results.
+> **Fictional sample.** Harbor Goods and all data here are fictional. Each repository in this portfolio is a
+> separate engagement with Harbor Goods, a fictional mid-size retailer. Account IDs are AWS documentation examples.
+> The billing records, recommendations and inventories are synthetic; all savings figures estimate outcomes from
+> them and none are measured results.
 
 | Item | Value |
 | --- | --- |
