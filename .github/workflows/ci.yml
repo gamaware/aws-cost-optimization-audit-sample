@@ -16,31 +16,31 @@ concurrency:
 jobs:
   lint-docs:
     name: lint-docs
-    uses: gamaware/.github/.github/workflows/lint-docs.yml@1255caafb08b06cc4658318c4dd48f9dea946c9e # gamaware/.github initial workflows
+    uses: gamaware/.github/.github/workflows/lint-docs.yml@1e2fe2d99f7772ad59b896f332557457ebcbdde9 # gamaware/.github initial workflows
     permissions:
       contents: read
 
   lint-actions:
     name: lint-actions
-    uses: gamaware/.github/.github/workflows/lint-actions.yml@1255caafb08b06cc4658318c4dd48f9dea946c9e # gamaware/.github initial workflows
+    uses: gamaware/.github/.github/workflows/lint-actions.yml@1e2fe2d99f7772ad59b896f332557457ebcbdde9 # gamaware/.github initial workflows
     permissions:
       contents: read
 
   secrets:
     name: secrets
-    uses: gamaware/.github/.github/workflows/secrets.yml@1255caafb08b06cc4658318c4dd48f9dea946c9e # gamaware/.github initial workflows
+    uses: gamaware/.github/.github/workflows/secrets.yml@1e2fe2d99f7772ad59b896f332557457ebcbdde9 # gamaware/.github initial workflows
     permissions:
       contents: read
 
   security:
     name: security
-    uses: gamaware/.github/.github/workflows/security.yml@1255caafb08b06cc4658318c4dd48f9dea946c9e # gamaware/.github initial workflows
+    uses: gamaware/.github/.github/workflows/security.yml@1e2fe2d99f7772ad59b896f332557457ebcbdde9 # gamaware/.github initial workflows
     permissions:
       contents: read
 
   report:
     name: report
-    uses: gamaware/.github/.github/workflows/report.yml@1255caafb08b06cc4658318c4dd48f9dea946c9e # gamaware/.github initial workflows
+    uses: gamaware/.github/.github/workflows/report.yml@1e2fe2d99f7772ad59b896f332557457ebcbdde9 # gamaware/.github initial workflows
     permissions:
       contents: read
     with:
