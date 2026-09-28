@@ -1,5 +1,7 @@
 # Every target except test-live runs offline: no AWS account, no credentials.
-# CI calls `make verify`, so a green local run means a green pipeline.
+# CI's verify job runs `make verify`. CI also runs shared workflows that `make verify` does not:
+# `pre-commit run -a` repeats markdownlint, actionlint, zizmor and gitleaks locally, while the link
+# check, Vale, Semgrep, Trivy, Checkov and the CI PDF render run only in CI.
 
 UV ?= uv
 RUN := $(UV) run --frozen
@@ -7,7 +9,7 @@ PY := PYTHONPATH=scripts $(RUN) python
 
 .PHONY: verify lint test check data evidence pdf summary test-live clean
 
-## verify: everything CI runs (lint, tests, output freshness)
+## verify: lint, tests and output freshness (the CI verify job)
 verify: lint test check
 	@echo "verify: all checks passed"
 
