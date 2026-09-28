@@ -124,7 +124,9 @@ docs/                  methodology, ADRs, diagrams, cover image
 
 ## Decisions and trade-offs
 
-| ADR | Title | Status |
+Architecture decision records follow the *Fundamentals of Software Architecture* (2nd ed.) format.
+
+| Number | Title | Status |
 | --- | --- | --- |
 | [0001](docs/adr/0001-generate-synthetic-exports.md) | Generate the synthetic exports from code | Accepted |
 | [0002](docs/adr/0002-render-report-from-template.md) | Render the report from a template with no hand-typed figures | Accepted |
