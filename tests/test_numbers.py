@@ -72,8 +72,9 @@ EXPECTED = {
     * ((9000 - 1200 * d("0.3")) + (3600 - 300 * d("0.3")) + (4800 - 400 * d("0.3") * 6) + (1800 - 150 * d("0.3"))),
     # 60% of 1,200 GB ingested at 0.50 per GB.
     "debug-logging": 1200 * d("0.6") * d("0.50"),
-    # 20,000 GB older than 30 days from 0.023 to 0.004, less 50 GB of retrievals at 0.03.
-    "s3-lifecycle": 20000 * (d("0.023") - d("0.004")) - 50 * d("0.03"),
+    # 20,000 GB older than 30 days from 0.023 to 0.004, less 50 GB of retrievals at 0.03 and the
+    # 4,000,000 objects a month that reach 30 days, transitioned at 0.02 per 1,000.
+    "s3-lifecycle": 20000 * (d("0.023") - d("0.004")) - 50 * d("0.03") - 4_000_000 / Decimal(1000) * d("0.02"),
     # Two of three staging NAT gateways, less 40 GB moved cross-AZ at 0.02.
     "nat-consolidation": 2 * H * d("0.045") - 40 * d("0.02"),
     # Production after resize: orders-db writer and reader at 2 x 1.16/h, reporting-db at 0.58/h, 30% discount.
@@ -126,3 +127,29 @@ def test_tag_coverage(ds):
     assert by_tag["environment"].untagged - by_tag["application"].untagged == 2 * H * d("0.216")
     # cost-center also misses CloudFront (30,000 GB x 0.085) and the ElastiCache nodes are tagged.
     assert by_tag["cost-center"].untagged - by_tag["application"].untagged == 30000 * d("0.085")
+
+
+def test_keeping_idle_instance_volumes_moves_them_to_gp3(ds):
+    """With the volume flag off, the root volumes are neither deleted nor counted twice."""
+    from copy import deepcopy
+
+    from costaudit import analysis
+
+    kept = deepcopy(ds)
+    kept.assumptions["idle"]["delete_volumes_of_idle_instances"] = False
+    audit = analysis.run(kept)
+    idle = audit.by_key("idle-instances").finding
+    gp3 = audit.by_key("gp2-to-gp3").finding
+    assert idle.monthly == money(2 * H * d("0.0832"))
+    assert not set(idle.resources) & set(gp3.resources)
+    assert gp3.monthly == money(EXPECTED["gp2-to-gp3"] + 2 * 100 * (d("0.10") - d("0.08")))
+
+
+def test_aurora_layout_comes_from_the_cur(ds):
+    from costaudit import findings
+
+    arn = "arn:aws:rds:us-east-1:{}:cluster:{}"
+    assert findings.aurora_instances(ds, arn.format("111122223333", "orders-db")) == 2
+    assert findings.aurora_instances(ds, arn.format("111122223333", "reporting-db")) == 1
+    assert findings.aurora_target_instances(ds, arn.format("444455556666", "orders-db-stg")) == 1
+    assert all("multiAZ" not in rec for rec in ds.rds_recs)

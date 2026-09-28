@@ -143,6 +143,7 @@ def idle_instances(ds: Dataset) -> Finding:
         "idle",
         basis="Instance hours plus attached volumes billed in the analysis period.",
     )
+    volumes = idle_instance_volumes(ds)
     for r in _flagged(ds, "Low Utilization Amazon EC2 Instances"):
         meta = r["metadata"]
         f.details.append(
@@ -154,7 +155,7 @@ def idle_instances(ds: Dataset) -> Finding:
                 Decimal(0),
             )
         )
-        for vol in meta["attachedVolumes"]:
+        for vol in (v for v in meta["attachedVolumes"] if v in volumes):
             f.details.append(
                 Detail(r["accountId"], vol, f"root volume of {meta['instanceName']}", costs[vol], Decimal(0))
             )
@@ -233,14 +234,34 @@ def rightsize_ec2(ds: Dataset) -> Finding:
     return f
 
 
-def rds_target_cost(ds: Dataset, cls: str, multi_az: bool) -> Decimal:
-    """Monthly on-demand instance cost of an Aurora cluster: a writer, plus a reader when Multi-AZ."""
-    instances = 2 if multi_az else 1
+def aurora_instances(ds: Dataset, arn: str) -> int:
+    """Instances in an Aurora cluster: its instance-hours in the analysis period over the hours in a month."""
+    hours = sum(
+        (ln.usage for ln in ds.current() if ln.resource == arn and ln.usage_type.startswith("InstanceUsage:")),
+        Decimal(0),
+    )
+    count = hours / ds.hours
+    if count != count.to_integral_value() or count < 1:
+        raise ValueError(f"{arn}: {hours} instance-hours is not a whole number of instances")
+    return int(count)
+
+
+def aurora_target_instances(ds: Dataset, arn: str) -> int:
+    """Instances after the change: the current count unless data/assumptions.json removes readers."""
+    name = arn.rsplit(":", 1)[1]
+    targets = {k: v for k, v in ds.assumptions["aurora_target_instances"].items() if not k.startswith("_")}
+    return int(targets.get(name, aurora_instances(ds, arn)))
+
+
+def rds_target_cost(ds: Dataset, cls: str, instances: int) -> Decimal:
+    """Monthly on-demand instance cost of an Aurora cluster: a writer plus any readers of one class."""
     return ds.hours * ds.price("aurora_postgresql_hourly", cls) * instances
 
 
-def aurora_layout(multi_az: bool) -> str:
-    return "writer and reader" if multi_az else "writer only"
+def aurora_layout(instances: int) -> str:
+    if instances == 1:
+        return "writer only"
+    return "writer and reader" if instances == 2 else f"writer and {instances - 1} readers"
 
 
 def rightsize_rds(ds: Dataset, environment: str) -> Finding:
@@ -257,22 +278,25 @@ def rightsize_rds(ds: Dataset, environment: str) -> Finding:
         f"rightsize-rds-{environment}",
         title,
         "rightsizing",
-        basis="Current instance-hour cost from the CUR; target uses the Compute Optimizer rank-1 class and "
-        "deployment at on-demand rates. Aurora storage and I/O do not change with the instance class.",
+        basis="Current instance-hour cost from the CUR; target uses the Compute Optimizer rank-1 class at "
+        "on-demand rates, for the instance count in data/assumptions.json. "
+        "Aurora storage and I/O do not change with the instance class.",
     )
     for rec in ds.rds_recs:
         if rec["instanceFinding"] != "Overprovisioned" or env_of.get(rec["resourceArn"]) != environment:
             continue
         option = next(o for o in rec["instanceRecommendationOptions"] if o["rank"] == 1)
-        target = rds_target_cost(ds, option["dbInstanceClass"], option["multiAZ"])
-        name = rec["resourceArn"].rsplit(":", 1)[1]
+        arn = rec["resourceArn"]
+        now, after = aurora_instances(ds, arn), aurora_target_instances(ds, arn)
+        target = rds_target_cost(ds, option["dbInstanceClass"], after)
+        name = arn.rsplit(":", 1)[1]
         f.details.append(
             Detail(
                 rec["accountId"],
                 name,
-                f"{rec['currentDBInstanceClass']} {aurora_layout(rec['multiAZ'])} to "
-                f"{option['dbInstanceClass']} {aurora_layout(option['multiAZ'])}",
-                instance_cost[rec["resourceArn"]],
+                f"{rec['currentDBInstanceClass']} {aurora_layout(now)} to "
+                f"{option['dbInstanceClass']} {aurora_layout(after)}",
+                instance_cost[arn],
                 target,
             )
         )
@@ -402,10 +426,11 @@ def s3_lifecycle(ds: Dataset) -> Finding:
         "s3-lifecycle",
         f"Move application logs older than {after} days to S3 Glacier Instant Retrieval",
         "usage",
-        basis="GB older than the transition age repriced at the target class, minus expected "
-        "retrieval fees; the transition requests are a one-time cost.",
+        basis="GB older than the transition age repriced at the target class, minus expected retrieval fees "
+        "and the monthly transition requests for objects that reach the transition age; moving the existing "
+        "backlog is a one-time cost.",
     )
-    gb = objects = Decimal(0)
+    gb = objects = monthly_objects = Decimal(0)
     for band in ds.s3_age:
         if band["bucket"] != cfg["bucket"]:
             continue
@@ -413,6 +438,10 @@ def s3_lifecycle(ds: Dataset) -> Finding:
         if low > after:
             gb += D(band["size_gb"])
             objects += D(band["object_count"])
+        elif low == 0:
+            # The youngest band holds `high` days of new objects; about 30 days' worth reach the rule each month.
+            high = int(band["age_band_days"].split("-")[1])
+            monthly_objects += D(band["object_count"]) * 30 / high
     f.details.append(
         Detail(
             _bucket_account(ds, cfg["bucket"]),
@@ -423,8 +452,11 @@ def s3_lifecycle(ds: Dataset) -> Finding:
         )
     )
     reads = D(cfg["expected_retrieval_gb_per_month"])
-    f.adjustment = -reads * ds.price("s3_glacier_ir_retrieval_per_gb")
-    f.adjustment_note = f"retrieval fees for {reads} GB of reads a month"
+    transitions = monthly_objects / 1000 * ds.price("s3_lifecycle_transition_per_1000_objects")
+    f.adjustment = -(reads * ds.price("s3_glacier_ir_retrieval_per_gb") + transitions)
+    f.adjustment_note = (
+        f"retrieval fees for {reads} GB of reads and transition requests for {monthly_objects:,} new objects a month"
+    )
     f.one_time = to_cents(objects / 1000 * ds.price("s3_lifecycle_transition_per_1000_objects"))
     return f
 
