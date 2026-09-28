@@ -246,11 +246,42 @@ def aurora_instances(ds: Dataset, arn: str) -> int:
     return int(count)
 
 
-def aurora_target_instances(ds: Dataset, arn: str) -> int:
+def aurora_target_instances(ds: Dataset, cluster_id: str, arn: str) -> int:
     """Instances after the change: the current count unless data/assumptions.json removes readers."""
-    name = arn.rsplit(":", 1)[1]
     targets = {k: v for k, v in ds.assumptions["aurora_target_instances"].items() if not k.startswith("_")}
-    return int(targets.get(name, aurora_instances(ds, arn)))
+    return int(targets[cluster_id]) if cluster_id in targets else aurora_instances(ds, arn)
+
+
+def rds_cluster_arn(rec: dict) -> str:
+    """The Aurora cluster ARN for a Compute Optimizer RDS recommendation.
+
+    Compute Optimizer returns one recommendation per DB instance, so resourceArn names a
+    writer or reader instance; cluster membership comes only from dbClusterIdentifier.
+    """
+    region = rec["resourceArn"].split(":")[3]
+    return f"arn:aws:rds:{region}:{rec['accountId']}:cluster:{rec['dbClusterIdentifier']}"
+
+
+def _rank1_class(rec: dict) -> str | None:
+    return next((o["dbInstanceClass"] for o in rec["instanceRecommendationOptions"] if o["rank"] == 1), None)
+
+
+def rds_clusters(ds: Dataset) -> list[tuple[str, dict]]:
+    """(cluster ARN, recommendation) once per Aurora cluster, from the per-instance recommendations.
+
+    The audit resizes every instance of a cluster to one class, so all instances of a cluster
+    must agree on the finding and the rank-1 class; a disagreement raises instead of guessing.
+    """
+    clusters: dict[str, dict] = {}
+    for rec in ds.rds_recs:
+        if "dbClusterIdentifier" not in rec:
+            raise ValueError(f"{rec['resourceArn']}: not an Aurora cluster member")
+        arn = rds_cluster_arn(rec)
+        first = clusters.setdefault(arn, rec)
+        fields = ("instanceFinding", "currentDBInstanceClass")
+        if [first[k] for k in fields] + [_rank1_class(first)] != [rec[k] for k in fields] + [_rank1_class(rec)]:
+            raise ValueError(f"{arn}: instances {first['resourceArn']} and {rec['resourceArn']} disagree")
+    return list(clusters.items())
 
 
 def rds_target_cost(ds: Dataset, cls: str, instances: int) -> Decimal:
@@ -282,14 +313,13 @@ def rightsize_rds(ds: Dataset, environment: str) -> Finding:
         "on-demand rates, for the instance count in data/assumptions.json. "
         "Aurora storage and I/O do not change with the instance class.",
     )
-    for rec in ds.rds_recs:
-        if rec["instanceFinding"] != "Overprovisioned" or env_of.get(rec["resourceArn"]) != environment:
+    for arn, rec in rds_clusters(ds):
+        if rec["instanceFinding"] != "Overprovisioned" or env_of.get(arn) != environment:
             continue
         option = next(o for o in rec["instanceRecommendationOptions"] if o["rank"] == 1)
-        arn = rec["resourceArn"]
-        now, after = aurora_instances(ds, arn), aurora_target_instances(ds, arn)
+        name = rec["dbClusterIdentifier"]
+        now, after = aurora_instances(ds, arn), aurora_target_instances(ds, name, arn)
         target = rds_target_cost(ds, option["dbInstanceClass"], after)
-        name = arn.rsplit(":", 1)[1]
         f.details.append(
             Detail(
                 rec["accountId"],

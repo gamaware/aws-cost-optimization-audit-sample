@@ -844,25 +844,28 @@ def compute_optimizer_rds() -> dict:
         "reporting-db": ("Optimized", "58.0", None, None),
         "orders-db-stg": ("Overprovisioned", "6.0", {"dbInstanceClass": "db.r5.large"}, "LOW"),
     }
+    # Compute Optimizer returns one recommendation per DB instance (writer and each reader), keyed by the
+    # instance ARN; only dbClusterIdentifier ties an instance to its Aurora cluster.
     recs = []
-    for db, acct, cls, _, _, _, _ in RDS:
+    for db, acct, cls, multi, _, _, _ in RDS:
         finding, cpu, target, risk = plan[db]
         options = []
         if target:
             options.append({**target, "rank": 1, "performanceRisk": risk})
-        recs.append(
-            {
-                "resourceArn": f"arn:aws:rds:{REGION}:{acct}:cluster:{db}",
-                "accountId": acct,
-                "engine": "aurora-postgresql",
-                "dbClusterIdentifier": db,
-                "currentDBInstanceClass": cls,
-                "instanceFinding": finding,
-                "lookBackPeriodInDays": 14,
-                "utilizationMetrics": [{"name": "CPU", "statistic": "MAXIMUM", "value": float(cpu)}],
-                "instanceRecommendationOptions": options,
-            }
-        )
+        for n in range(1, (2 if multi else 1) + 1):
+            recs.append(
+                {
+                    "resourceArn": f"arn:aws:rds:{REGION}:{acct}:db:{db}-instance-{n}",
+                    "accountId": acct,
+                    "engine": "aurora-postgresql",
+                    "dbClusterIdentifier": db,
+                    "currentDBInstanceClass": cls,
+                    "instanceFinding": finding,
+                    "lookBackPeriodInDays": 14,
+                    "utilizationMetrics": [{"name": "CPU", "statistic": "MAXIMUM", "value": float(cpu)}],
+                    "instanceRecommendationOptions": options,
+                }
+            )
     return {"rdsDBRecommendations": recs}
 
 

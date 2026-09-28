@@ -28,8 +28,10 @@ All exports in this sample contain synthetic data, as documented in
    the scripts price using their CUR lines. Snapshots qualify under a separate rule only when
    they exceed the age threshold, have no retention tag and are not used by an AMI.
 3. **Adjust capacity and operating hours.** For every over-provisioned Compute Optimizer finding,
-   the scripts price the rank-1 recommendation using on-demand rates. The staging schedule limits
-   operation to working hours.
+   the scripts price the rank-1 recommendation using on-demand rates. Compute Optimizer returns one
+   RDS recommendation per DB instance, keyed by the instance ARN, so the scripts group writer and
+   readers into their Aurora cluster by `dbClusterIdentifier` before pricing the cluster. The
+   staging schedule limits operation to working hours.
 4. **Revise storage, logging and networking.** Changes include converting gp2 to gp3 while
    preserving gp2 throughput, adjusting log retention and DEBUG logging, applying an S3 lifecycle
    rule and consolidating NAT gateways. Estimates deduct any fees introduced by each change;

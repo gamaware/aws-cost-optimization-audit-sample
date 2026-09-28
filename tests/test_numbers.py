@@ -151,5 +151,36 @@ def test_aurora_layout_comes_from_the_cur(ds):
     arn = "arn:aws:rds:us-east-1:{}:cluster:{}"
     assert findings.aurora_instances(ds, arn.format("111122223333", "orders-db")) == 2
     assert findings.aurora_instances(ds, arn.format("111122223333", "reporting-db")) == 1
-    assert findings.aurora_target_instances(ds, arn.format("444455556666", "orders-db-stg")) == 1
+    assert findings.aurora_target_instances(ds, "orders-db-stg", arn.format("444455556666", "orders-db-stg")) == 1
     assert all("multiAZ" not in rec for rec in ds.rds_recs)
+
+
+def test_rds_recommendations_resolve_to_clusters_by_identifier(ds):
+    """Compute Optimizer names DB instances; the cluster (and its target count) comes from dbClusterIdentifier."""
+    from costaudit import findings
+
+    assert all(":db:" in rec["resourceArn"] for rec in ds.rds_recs)
+    stg = [rec for rec in ds.rds_recs if rec["dbClusterIdentifier"] == "orders-db-stg"]
+    assert len(stg) == 2  # writer and reader, one recommendation each
+    clusters = dict(findings.rds_clusters(ds))
+    assert set(clusters) == {
+        "arn:aws:rds:us-east-1:111122223333:cluster:orders-db",
+        "arn:aws:rds:us-east-1:111122223333:cluster:reporting-db",
+        "arn:aws:rds:us-east-1:444455556666:cluster:orders-db-stg",
+    }
+    staging = findings.rightsize_rds(ds, "staging")
+    assert [d.resource for d in staging.details] == ["orders-db-stg"]
+    assert staging.details[0].target == money(H * d("0.29"))  # one db.r5.large: the reader is removed
+
+
+def test_rds_cluster_instances_must_agree(ds):
+    import copy
+
+    from costaudit import findings
+
+    bad = copy.copy(ds)
+    bad.rds_recs = copy.deepcopy(ds.rds_recs)
+    reader = next(r for r in bad.rds_recs if r["resourceArn"].endswith("orders-db-stg-instance-2"))
+    reader["instanceRecommendationOptions"][0]["dbInstanceClass"] = "db.r5.xlarge"
+    with pytest.raises(ValueError, match="disagree"):
+        findings.rds_clusters(bad)
