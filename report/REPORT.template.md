@@ -150,9 +150,11 @@ CUR line types establish the following coverage for {{period}}:
 
 {{table:coverage}}
 
-The existing Compute Savings Plan is fully utilized and applies exclusively to the storefront
-web fleet, giving Harbor Goods {{sp_coverage}} coverage. The next plan's sizing uses the observed
-{{sp_discount}} discount because it reflects the instance families Harbor Goods runs.
+The existing Compute Savings Plan is fully utilized and applies exclusively to the four
+`m5.xlarge` instances of the reporting worker fleet, giving Harbor Goods {{sp_coverage}} coverage.
+The storefront web tier runs on ECS Fargate; its tasks are eligible but run on demand. The next
+plan's sizing uses the observed {{sp_discount}} discount because it reflects the instance families
+Harbor Goods runs.
 
 For the proposed Compute Savings Plan ({{compute-savings-plan.id}}), sizing follows these criteria:
 
@@ -161,6 +163,8 @@ For the proposed Compute Savings Plan ({{compute-savings-plan.id}}), sizing foll
 - Set the commitment at {{sp_target_share}} of baseline usage, leaving room for additional
   rightsizing or migration to Graviton or containers.
 - Round down the hourly commitment to a valid purchase increment.
+- Leave the storefront's Fargate spend out of the baseline. A Compute Savings Plan also applies to
+  Fargate, so that usage absorbs any commitment that further EC2 rightsizing frees.
 
 {{table:sp_sizing}}
 

@@ -35,7 +35,9 @@ def coverage(ds: Dataset) -> Coverage:
         (
             ln.od_cost
             for ln in cur
-            if (ln.service == "AmazonEC2" and ln.usage_type.startswith("BoxUsage:")) or ln.service == "AWSLambda"
+            if (ln.service == "AmazonEC2" and ln.usage_type.startswith("BoxUsage:"))
+            or (ln.service == "AmazonECS" and "Fargate" in ln.usage_type)
+            or ln.service == "AWSLambda"
         ),
         Decimal(0),
     )

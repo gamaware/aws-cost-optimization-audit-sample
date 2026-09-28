@@ -18,3 +18,9 @@ releases are revisions of the report rather than SemVer releases of an API.
 - CI calls the shared `gamaware/.github` workflows pinned to a commit SHA, including the shared report
   evidence check and PDF render, plus an OpenSSF Scorecard workflow.
 - Social preview (`docs/assets/social-preview.png`) rendered with the shared generator.
+
+### Changed
+
+- The storefront web tier is modelled on ECS Fargate, as in the other Harbor Goods samples. The four
+  `m5.xlarge` instances under the existing Savings Plan now belong to a reporting worker fleet, and the
+  Fargate tasks count as Savings Plans eligible spend. Data, evidence, report and PDF were regenerated.

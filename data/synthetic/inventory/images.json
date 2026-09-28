@@ -2,7 +2,7 @@
   "Images": [
     {
       "ImageId": "ami-0a1000000000000001",
-      "Name": "harbor-goods-web-golden",
+      "Name": "harbor-goods-reporting-golden",
       "OwnerId": "111122223333",
       "SnapshotIds": [
         "snap-0a1000000000000003"

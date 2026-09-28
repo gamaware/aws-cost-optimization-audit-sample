@@ -3,7 +3,7 @@
     {
       "instanceArn": "arn:aws:ec2:us-east-1:111122223333:instance/i-0a100000000000001",
       "accountId": "111122223333",
-      "instanceName": "web-01",
+      "instanceName": "report-01",
       "currentInstanceType": "m5.xlarge",
       "finding": "Optimized",
       "lookBackPeriodInDays": 14,
@@ -24,7 +24,7 @@
     {
       "instanceArn": "arn:aws:ec2:us-east-1:111122223333:instance/i-0a100000000000002",
       "accountId": "111122223333",
-      "instanceName": "web-02",
+      "instanceName": "report-02",
       "currentInstanceType": "m5.xlarge",
       "finding": "Optimized",
       "lookBackPeriodInDays": 14,
@@ -45,7 +45,7 @@
     {
       "instanceArn": "arn:aws:ec2:us-east-1:111122223333:instance/i-0a100000000000003",
       "accountId": "111122223333",
-      "instanceName": "web-03",
+      "instanceName": "report-03",
       "currentInstanceType": "m5.xlarge",
       "finding": "Optimized",
       "lookBackPeriodInDays": 14,
@@ -66,7 +66,7 @@
     {
       "instanceArn": "arn:aws:ec2:us-east-1:111122223333:instance/i-0a100000000000004",
       "accountId": "111122223333",
-      "instanceName": "web-04",
+      "instanceName": "report-04",
       "currentInstanceType": "m5.xlarge",
       "finding": "Optimized",
       "lookBackPeriodInDays": 14,

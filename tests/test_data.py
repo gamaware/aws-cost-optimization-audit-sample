@@ -81,3 +81,13 @@ def test_s3_age_report_matches_billed_storage(ds):
 def test_generator_is_executable():
     path = Path(generate_synthetic.__file__)
     assert path.read_text().startswith("#!/usr/bin/env python3")
+
+
+def test_storefront_compute_runs_on_fargate(ds):
+    storefront = [ln for ln in ds.lines if ln.tag("application") == "storefront"]
+    assert not [ln for ln in storefront if ln.usage_type.startswith("BoxUsage:")], "storefront has EC2 instances"
+    assert {ln.period for ln in storefront if ln.service == "AmazonECS" and "Fargate" in ln.usage_type} == {
+        "M1",
+        "M2",
+        "M3",
+    }

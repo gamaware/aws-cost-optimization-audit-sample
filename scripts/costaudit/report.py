@@ -30,6 +30,7 @@ SERVICE_NAMES = {
     "ComputeSavingsPlans": "Savings Plans fee",
     "AmazonElastiCache": "Amazon ElastiCache",
     "AWSLambda": "AWS Lambda",
+    "AmazonECS": "Amazon ECS (Fargate)",
     "AWSELB": "Elastic Load Balancing",
     "AmazonVPC": "Amazon VPC (public IPv4)",
 }

@@ -14,9 +14,9 @@ An offline AWS cost audit of a fictional retailer's billing data, with ranked sa
 
 ## Executive summary
 
-Monthly AWS spending across Harbor Goods' three accounts totals $24,070.34, up 10.0% from two
+Monthly AWS spending across Harbor Goods' three accounts totals $24,502.82, up 9.8% from two
 months earlier. Across 16 opportunities, the audit estimates savings of
-**$8,134.97 a month ($97,619.64 a year)**, equivalent to 33.8% of the bill.
+**$8,134.97 a month ($97,619.64 a year)**, equivalent to 33.2% of the bill.
 
 | Group | Items | Estimated monthly saving |
 | --- | ---: | ---: |
@@ -30,7 +30,7 @@ The three highest-ranked recommendations and their estimated monthly savings are
 2. Rightsize the staging orders database and remove its reader: $1,481.90 per month.
 3. Rightsize over-provisioned EC2 instances: $840.96 per month.
 
-The `cost-center` tag covers just 79.0% of spending; Savings Plans cover 8.9% of eligible compute.
+The `cost-center` tag covers just 79.4% of spending; Savings Plans cover 8.3% of eligible compute.
 Alongside its tagging and allocation plan, the report calculates new commitment sizes from the
 usage that would remain after rightsizing.
 
@@ -50,10 +50,11 @@ usage that would remain after rightsizing.
 ## Scenario and acceptance criteria
 
 The fictional mid-size retailer Harbor Goods uses AWS for its storefront, order API, batch
-inventory synchronization, and small analytics warehouse. The orders database runs on Amazon Aurora
-PostgreSQL. Production, staging, and shared services
-each have an account. Bills have increased for three months without anyone owning the cost.
-Read-only access limits the audit to inspection; it makes no changes.
+inventory synchronization, reporting workers, and small analytics warehouse. The storefront web tier
+runs on Amazon ECS on AWS Fargate, and the orders database runs on Amazon Aurora PostgreSQL.
+Production, staging, and shared services each have an account. Bills have increased for three
+months without anyone owning the cost. Read-only access limits the audit to inspection; it makes
+no changes.
 
 Acceptance requires the following:
 

@@ -12,17 +12,17 @@
 | Client | Harbor Goods (fictional mid-size retailer) |
 | Scope | 3 AWS accounts in one AWS Organization, region `us-east-1` |
 | Billing window | M1 to M3 (three monthly billing periods, oldest first) |
-| Analysis period | M3, net unblended cost $24,070.34 |
+| Analysis period | M3, net unblended cost $24,502.82 |
 | Access used | Read-only exports; no change was made to any account |
 | Deliverable | This report, `evidence/` and the scripts that produced both |
 
 ## 1. Executive summary
 
-AWS spending for Harbor Goods reached $24,070.34 in M3, an increase of
-10.0% ($2,194.08) from M1. Across 16 opportunities,
+AWS spending for Harbor Goods reached $24,502.82 in M3, an increase of
+9.8% ($2,194.08) from M1. Across 16 opportunities,
 the audit estimates savings of **$8,134.97 a month ($97,619.64 a year)**,
-equivalent to 33.8% of the M3 bill. Completing every recommendation would bring
-monthly costs for the same workload to approximately $15,935.37.
+equivalent to 33.2% of the M3 bill. Completing every recommendation would bring
+monthly costs for the same workload to approximately $16,367.85.
 
 - **10 quick wins** offer $3,889.12 in monthly savings at low effort and low
   risk. Most involve removing idle resources or changing a single setting; a platform engineer can
@@ -38,7 +38,7 @@ The largest three opportunities account for these estimated monthly savings:
 2. **SAV-03: Rightsize the staging orders database and remove its reader** reduces monthly costs by $1,481.90.
 3. **SAV-01: Rightsize over-provisioned EC2 instances** reduces monthly costs by $840.96.
 
-Incomplete tagging also limits cost allocation: `cost-center` appears on only 79.0%
+Incomplete tagging also limits cost allocation: `cost-center` appears on only 79.4%
 of spending in M3. Finance therefore cannot yet provide individual team bills.
 Section 9 describes the corrective work.
 
@@ -46,8 +46,8 @@ Section 9 describes the corrective work.
 
 Only exports inform this audit, matching the files a client would supply through read-only access:
 
-- **Cost and Usage Report (CUR 2.0 columns)**: `data/synthetic/cur/` contains 381 line
-  items covering 13 services, aggregated by resource and billing period.
+- **Cost and Usage Report (CUR 2.0 columns)**: `data/synthetic/cur/` contains 387 line
+  items covering 14 services, aggregated by resource and billing period.
 - **AWS Compute Optimizer**: recommendations for EC2 and RDS based on a 14-day look-back.
 - **AWS Trusted Advisor**: cost-optimization checks identifying idle and unattached resources.
 - **Inventories**: records of EBS snapshots, AMIs, CloudWatch log groups, NAT gateways and the
@@ -74,14 +74,14 @@ us-east-1 are also beyond scope.
 
 | Service | M1 | M2 | M3 | Change M1 to M3 | Share of M3 |
 | -------------------------- | ------------: | ------------: | ------------: | -------------------: | -------------: |
-| Amazon EC2 (instances, EBS, NAT) | $6,385.67 | $7,758.95 | $7,785.95 | $1,400.28 (21.9%) | 32.3% |
-| Amazon RDS | $6,184.20 | $6,184.20 | $6,184.20 | $0.00 (0.0%) | 25.7% |
-| Amazon CloudFront | $2,380.00 | $2,465.00 | $2,550.00 | $170.00 (7.1%) | 10.6% |
-| Amazon CloudWatch | $1,345.00 | $1,486.00 | $1,627.00 | $282.00 (21.0%) | 6.8% |
-| Amazon Redshift | $1,585.56 | $1,585.56 | $1,585.56 | $0.00 (0.0%) | 6.6% |
-| Amazon S3 | $1,448.00 | $1,497.00 | $1,545.00 | $97.00 (6.7%) | 6.4% |
-| All other (7 services) | $2,547.83 | $2,671.03 | $2,792.63 | $244.80 (9.6%) | 11.6% |
-| **Total** | **$21,876.26** | **$23,647.74** | **$24,070.34** | **$2,194.08 (10.0%)** | **100.0%** |
+| Amazon EC2 (instances, EBS, NAT) | $6,385.67 | $7,758.95 | $7,785.95 | $1,400.28 (21.9%) | 31.8% |
+| Amazon RDS | $6,184.20 | $6,184.20 | $6,184.20 | $0.00 (0.0%) | 25.2% |
+| Amazon CloudFront | $2,380.00 | $2,465.00 | $2,550.00 | $170.00 (7.1%) | 10.4% |
+| Amazon CloudWatch | $1,345.00 | $1,486.00 | $1,627.00 | $282.00 (21.0%) | 6.6% |
+| Amazon Redshift | $1,585.56 | $1,585.56 | $1,585.56 | $0.00 (0.0%) | 6.5% |
+| Amazon S3 | $1,448.00 | $1,497.00 | $1,545.00 | $97.00 (6.7%) | 6.3% |
+| All other (8 services) | $2,980.31 | $3,103.51 | $3,225.11 | $244.80 (8.2%) | 13.2% |
+| **Total** | **$22,308.74** | **$24,080.22** | **$24,502.82** | **$2,194.08 (9.8%)** | **100.0%** |
 
 Spending increased $2,194.08 across the billing window, with the largest changes in:
 
@@ -96,9 +96,9 @@ The account breakdown follows:
 
 | Account | M1 | M2 | M3 | Change M1 to M3 | Share of M3 |
 | -------------------------------- | ------------: | ------------: | ------------: | ------------------: | -------------: |
-| `111122223333` (production) | $17,575.39 | $18,610.73 | $18,982.83 | $1,407.44 (8.0%) | 78.9% |
-| `444455556666` (staging) | $3,059.84 | $3,724.98 | $3,729.48 | $669.64 (21.9%) | 15.5% |
-| `123456789012` (shared services) | $1,241.03 | $1,312.03 | $1,358.03 | $117.00 (9.4%) | 5.6% |
+| `111122223333` (production) | $18,007.87 | $19,043.21 | $19,415.31 | $1,407.44 (7.8%) | 79.2% |
+| `444455556666` (staging) | $3,059.84 | $3,724.98 | $3,729.48 | $669.64 (21.9%) | 15.2% |
+| `123456789012` (shared services) | $1,241.03 | $1,312.03 | $1,358.03 | $117.00 (9.4%) | 5.5% |
 
 ## 4. Ranked savings
 
@@ -226,7 +226,7 @@ in each. Load tests drive staging CPU to 65%, supporting its current instance si
 
 | Resource | Current type | Compute Optimizer finding | Max CPU | Max memory |
 | -------------- | -------------- | --------------------------- | ---------: | ------------: |
-| web-01 | m5.xlarge | Optimized | 41% | 58% |
+| report-01 | m5.xlarge | Optimized | 41% | 58% |
 | batch-01 | c5.4xlarge | Optimized | 88% | 61% |
 | stg-app-01 | m5.2xlarge | Optimized | 65% | 48% |
 | ci-runner-01 | c5.xlarge | Optimized | 92% | 40% |
@@ -237,17 +237,19 @@ CUR line types establish the following coverage for M3:
 
 | Measure | Value |
 | -------------------------- | -----------: |
-| Savings Plans eligible on-demand spend (M3) | $6,319.89 |
+| Savings Plans eligible on-demand spend (M3) | $6,752.37 |
 | Covered by the existing Compute Savings Plan | $560.64 |
-| Savings Plans coverage | 8.9% |
+| Savings Plans coverage | 8.3% |
 | Existing plan utilization | 100.0% |
 | Observed Savings Plan discount (1 - fee / covered) | 27.1% |
 | RDS instance-hour spend (M3) | $5,504.20 |
 | RDS Reserved Instance coverage | 0.0% |
 
-The existing Compute Savings Plan is fully utilized and applies exclusively to the storefront
-web fleet, giving Harbor Goods 8.9% coverage. The next plan's sizing uses the observed
-27.1% discount because it reflects the instance families Harbor Goods runs.
+The existing Compute Savings Plan is fully utilized and applies exclusively to the four
+`m5.xlarge` instances of the reporting worker fleet, giving Harbor Goods 8.3% coverage.
+The storefront web tier runs on ECS Fargate; its tasks are eligible but run on demand. The next
+plan's sizing uses the observed 27.1% discount because it reflects the instance families
+Harbor Goods runs.
 
 For the proposed Compute Savings Plan (SAV-15), sizing follows these criteria:
 
@@ -256,6 +258,8 @@ For the proposed Compute Savings Plan (SAV-15), sizing follows these criteria:
 - Set the commitment at 80% of baseline usage, leaving room for additional
   rightsizing or migration to Graviton or containers.
 - Round down the hourly commitment to a valid purchase increment.
+- Leave the storefront's Fargate spend out of the baseline. A Compute Savings Plan also applies to
+  Fargate, so that usage absorbs any commitment that further EC2 rightsizing frees.
 
 | Step | Value |
 | -------------------------- | -----------: |
@@ -266,8 +270,8 @@ For the proposed Compute Savings Plan (SAV-15), sizing follows these criteria:
 | Commitment per month | $1,753.46 |
 | Estimated saving per month | $651.29 |
 
-EC2 changes reduce eligible monthly on-demand spending to $4,635.54. Together, the
-existing and proposed plans would cover 64.0% of that spending.
+EC2 changes reduce eligible monthly on-demand spending to $5,068.02. Together, the
+existing and proposed plans would cover 58.5% of that spending.
 
 The following instances form the baseline:
 
@@ -343,9 +347,9 @@ for the decision and purchase.
 
 | Required tag | Share of M3 cost tagged | Untagged cost |
 | -------------- | -------------------------: | ---------------: |
-| `application` | 89.6% | $2,494.25 |
-| `environment` | 88.3% | $2,809.61 |
-| `cost-center` | 79.0% | $5,044.25 |
+| `application` | 89.8% | $2,494.25 |
+| `environment` | 88.5% | $2,809.61 |
+| `cost-center` | 79.4% | $5,044.25 |
 
 Spending without tags in M3 has three components. Resources account for
 $1,185.45, which resource tagging can address. Account-level data transfer

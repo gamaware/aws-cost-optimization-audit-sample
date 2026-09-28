@@ -111,11 +111,11 @@ def instances() -> list[dict]:
 
     for n in range(1, 5):
         add(
-            f"web-0{n}",
+            f"report-0{n}",
             f"i-0a10000000000000{n}",
             PROD,
             "m5.xlarge",
-            tags(f"web-0{n}", "storefront", "prod", "digital"),
+            tags(f"report-0{n}", "reporting", "prod", "finance"),
             sp=True,
         )
     for n in range(1, 7):
@@ -164,7 +164,7 @@ def instances() -> list[dict]:
 
 # Attached volumes follow their instance. (instance name, volume id, type, GB)
 ATTACHED_VOLUMES = (
-    [(f"web-0{n}", f"vol-0a10000000000000{n}", "gp2", 100) for n in range(1, 5)]
+    [(f"report-0{n}", f"vol-0a10000000000000{n}", "gp2", 100) for n in range(1, 5)]
     + [(f"app-0{n}", f"vol-0a20000000000000{n}", "gp2", 500) for n in range(1, 7)]
     + [(f"batch-0{n}", f"vol-0a30000000000000{n}", "gp3", 1000) for n in range(1, 5)]
     + [("bastion-01", "vol-0a400000000000001", "gp3", 30)]
@@ -200,7 +200,7 @@ SNAPSHOTS = [
 AMIS = [
     {
         "ImageId": "ami-0a1000000000000001",
-        "Name": "harbor-goods-web-golden",
+        "Name": "harbor-goods-reporting-golden",
         "OwnerId": PROD,
         "SnapshotIds": ["snap-0a1000000000000003"],
     },
@@ -345,7 +345,28 @@ LOG_BUCKET_AGE = [
 ]
 
 # Flat-cost services: (service, account, resource, usage type, operation, cost by period, eligible for Compute SP, tags)
+# The storefront web tier runs on ECS Fargate: 12 tasks of 1 vCPU and 2 GB around the clock.
 FLAT = [
+    (
+        "AmazonECS",
+        PROD,
+        f"arn:aws:ecs:{REGION}:{PROD}:service/storefront/storefront-web",
+        "USE1-Fargate-vCPU-Hours:perCPU",
+        "FargateTask",
+        ("354.60", "354.60", "354.60"),
+        True,
+        tags("storefront-web", "storefront", "prod", "digital"),
+    ),
+    (
+        "AmazonECS",
+        PROD,
+        f"arn:aws:ecs:{REGION}:{PROD}:service/storefront/storefront-web",
+        "USE1-Fargate-GB-Hours",
+        "FargateTask",
+        ("77.88", "77.88", "77.88"),
+        True,
+        tags("storefront-web", "storefront", "prod", "digital"),
+    ),
     (
         "AWSLambda",
         PROD,
@@ -773,7 +794,7 @@ def ec2_arn(acct: str, iid: str) -> str:
 def compute_optimizer_ec2() -> dict:
     recs = []
     cpu_mem = {
-        "web": ("Optimized", "41.0", "58.0", None),
+        "report": ("Optimized", "41.0", "58.0", None),
         "app": ("Overprovisioned", "17.0", "34.0", ("m5.xlarge", "LOW")),
         "batch": ("Optimized", "88.0", "61.0", None),
         "stg-app": ("Optimized", "65.0", "48.0", None),

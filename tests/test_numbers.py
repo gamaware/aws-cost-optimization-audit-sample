@@ -34,9 +34,9 @@ def raw_totals() -> dict[str, Decimal]:
 
 def test_period_totals():
     t = raw_totals()
-    assert money(t["M1"]) == d("21876.26")
-    assert money(t["M2"]) == d("23647.74")
-    assert money(t["M3"]) == d("24070.34")
+    assert money(t["M1"]) == d("22308.74")
+    assert money(t["M2"]) == d("24080.22")
+    assert money(t["M3"]) == d("24502.82")
 
 
 def test_loader_agrees_with_raw_csv(ds):
@@ -108,6 +108,8 @@ def test_coverage(audit):
         + (6 * d("0.384") + 4 * d("0.68") + d("0.0416") + 4 * d("0.384") + d("0.34") + 2 * d("0.17") + 5 * d("0.0832"))
         * H
         + d("140")  # Lambda in M3 (flat cost line; Lambda is Compute Savings Plan eligible)
+        + d("354.60")
+        + d("77.88")  # storefront Fargate vCPU and GB hours (12 tasks x 1 vCPU, 2 GB x 730 h)
     )
     assert c.eligible_od == eligible
     assert c.sp_coverage == d("560.64") / eligible
