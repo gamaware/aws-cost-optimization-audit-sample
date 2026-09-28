@@ -1,0 +1,168 @@
+{
+  "checks": [
+    {
+      "name": "Low Utilization Amazon EC2 Instances",
+      "status": "warning",
+      "flaggedResources": [
+        {
+          "resourceId": "i-0c200000000000004",
+          "accountId": "123456789012",
+          "region": "us-east-1",
+          "metadata": {
+            "instanceName": "dev-04",
+            "instanceType": "t3.large",
+            "fourteenDayAverageCpuPercent": 1.2,
+            "fourteenDayAverageNetworkIoMb": 0.4,
+            "attachedVolumes": [
+              "vol-0c200000000000004"
+            ]
+          }
+        },
+        {
+          "resourceId": "i-0c200000000000005",
+          "accountId": "123456789012",
+          "region": "us-east-1",
+          "metadata": {
+            "instanceName": "dev-05",
+            "instanceType": "t3.large",
+            "fourteenDayAverageCpuPercent": 1.2,
+            "fourteenDayAverageNetworkIoMb": 0.4,
+            "attachedVolumes": [
+              "vol-0c200000000000005"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Underutilized Amazon EBS Volumes",
+      "status": "warning",
+      "flaggedResources": [
+        {
+          "resourceId": "vol-0a9000000000000e1",
+          "accountId": "111122223333",
+          "region": "us-east-1",
+          "metadata": {
+            "volumeType": "gp2",
+            "sizeGiB": 1000,
+            "state": "available",
+            "note": "left over from the app fleet rebuild"
+          }
+        },
+        {
+          "resourceId": "vol-0a9000000000000e2",
+          "accountId": "111122223333",
+          "region": "us-east-1",
+          "metadata": {
+            "volumeType": "gp2",
+            "sizeGiB": 500,
+            "state": "available",
+            "note": "detached test restore"
+          }
+        },
+        {
+          "resourceId": "vol-0b9000000000000e1",
+          "accountId": "444455556666",
+          "region": "us-east-1",
+          "metadata": {
+            "volumeType": "gp2",
+            "sizeGiB": 500,
+            "state": "available",
+            "note": "old staging database volume"
+          }
+        },
+        {
+          "resourceId": "vol-0c9000000000000e1",
+          "accountId": "123456789012",
+          "region": "us-east-1",
+          "metadata": {
+            "volumeType": "gp3",
+            "sizeGiB": 2000,
+            "state": "available",
+            "note": "retired build cache"
+          }
+        },
+        {
+          "resourceId": "vol-0c9000000000000e2",
+          "accountId": "123456789012",
+          "region": "us-east-1",
+          "metadata": {
+            "volumeType": "gp2",
+            "sizeGiB": 250,
+            "state": "available",
+            "note": "detached from a terminated dev box"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Unassociated Elastic IP Addresses",
+      "status": "warning",
+      "flaggedResources": [
+        {
+          "resourceId": "eipalloc-0a1000000000000001",
+          "accountId": "111122223333",
+          "region": "us-east-1",
+          "metadata": {
+            "publicIp": "203.0.113.10"
+          }
+        },
+        {
+          "resourceId": "eipalloc-0a1000000000000002",
+          "accountId": "111122223333",
+          "region": "us-east-1",
+          "metadata": {
+            "publicIp": "203.0.113.11"
+          }
+        },
+        {
+          "resourceId": "eipalloc-0b1000000000000001",
+          "accountId": "444455556666",
+          "region": "us-east-1",
+          "metadata": {
+            "publicIp": "203.0.113.20"
+          }
+        },
+        {
+          "resourceId": "eipalloc-0c1000000000000001",
+          "accountId": "123456789012",
+          "region": "us-east-1",
+          "metadata": {
+            "publicIp": "203.0.113.30"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Idle Load Balancers",
+      "status": "warning",
+      "flaggedResources": [
+        {
+          "resourceId": "legacy-promo-alb",
+          "accountId": "111122223333",
+          "region": "us-east-1",
+          "metadata": {
+            "type": "application",
+            "requestsLast14Days": 0,
+            "reason": "No requests"
+          }
+        },
+        {
+          "resourceId": "stg-legacy-clb",
+          "accountId": "444455556666",
+          "region": "us-east-1",
+          "metadata": {
+            "type": "classic",
+            "requestsLast14Days": 0,
+            "reason": "No requests"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Amazon EC2 Reserved Instances Optimization",
+      "status": "ok",
+      "flaggedResources": []
+    }
+  ]
+}

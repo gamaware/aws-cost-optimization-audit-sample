@@ -1,0 +1,17 @@
+rank,id,key,title,monthly_usd,annual_usd,one_time_usd,effort,risk,type
+1,SAV-02,rightsize-rds-prod,Rightsize the production orders database,1693.60,20323.20,0,Medium,Medium,Planned work
+2,SAV-03,rightsize-rds-staging,Rightsize the staging orders database and remove its reader,1481.90,17782.80,0,Low,Low,Quick win
+3,SAV-01,rightsize-ec2,Rightsize over-provisioned EC2 instances,840.96,10091.52,0,Medium,Medium,Planned work
+4,SAV-04,schedule-staging,Run staging order-api instances on a working-hours schedule,721.92,8663.04,0,Low,Low,Quick win
+5,SAV-15,compute-savings-plan,Buy a one-year Compute Savings Plan for the steady EC2 baseline,651.29,7815.48,0,Low,Medium,Planned work
+6,SAV-16,rds-reserved-instances,Buy one-year RDS Reserved Instances for production after the resize,635.10,7621.20,0,Low,Medium,Planned work
+7,SAV-11,log-retention,Set CloudWatch Logs retention on groups that never expire,539.55,6474.60,0,Low,Low,Quick win
+8,SAV-05,unattached-ebs,Delete unattached EBS volumes after a rollback snapshot,385.00,4620.00,212.50,Low,Low,Quick win
+9,SAV-13,s3-lifecycle,Move application logs older than 30 days to S3 Glacier Instant Retrieval,378.50,4542.00,800.00,Low,Low,Quick win
+10,SAV-12,debug-logging,Turn off DEBUG logging in production order-api,360.00,4320.00,0,Medium,Low,Planned work
+11,SAV-10,idle-instances,"Stop, then terminate idle untagged instances",141.47,1697.64,0,Low,Low,Quick win
+12,SAV-07,old-snapshots,Delete EBS snapshots older than 180 days,122.50,1470.00,0,Low,Low,Quick win
+13,SAV-06,gp2-to-gp3,Change attached gp2 volumes to gp3,69.00,828.00,0,Low,Low,Quick win
+14,SAV-14,nat-consolidation,Consolidate staging NAT gateways to one,64.90,778.80,0,Medium,Low,Planned work
+15,SAV-09,idle-load-balancers,Delete idle load balancers,34.68,416.16,0,Low,Low,Quick win
+16,SAV-08,idle-eip,Release unassociated Elastic IP addresses,14.60,175.20,0,Low,Low,Quick win

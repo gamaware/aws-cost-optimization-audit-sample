@@ -1,0 +1,31 @@
+[project]
+name = "aws-cost-optimization-audit-sample"
+version = "1.0.0"
+description = "Offline AWS cost optimization audit of the fictional Harbor Goods account set."
+requires-python = ">=3.12"
+license = "MIT"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "pytest==9.1.1",
+    "ruff==0.16.9",
+    "pypdf==6.19.0",
+]
+
+[tool.uv]
+exclude-newer = "7 days"
+exclude-newer-package = { ruff = false }
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["scripts"]
+addopts = "-q --strict-markers"
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF"]

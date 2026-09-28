@@ -1,0 +1,40 @@
+{
+  "NatGateways": [
+    {
+      "NatGatewayId": "nat-0a1000000000000001",
+      "AccountId": "111122223333",
+      "AvailabilityZone": "us-east-1a",
+      "Environment": "prod"
+    },
+    {
+      "NatGatewayId": "nat-0a1000000000000002",
+      "AccountId": "111122223333",
+      "AvailabilityZone": "us-east-1b",
+      "Environment": "prod"
+    },
+    {
+      "NatGatewayId": "nat-0a1000000000000003",
+      "AccountId": "111122223333",
+      "AvailabilityZone": "us-east-1c",
+      "Environment": "prod"
+    },
+    {
+      "NatGatewayId": "nat-0b1000000000000001",
+      "AccountId": "444455556666",
+      "AvailabilityZone": "us-east-1a",
+      "Environment": "staging"
+    },
+    {
+      "NatGatewayId": "nat-0b1000000000000002",
+      "AccountId": "444455556666",
+      "AvailabilityZone": "us-east-1b",
+      "Environment": "staging"
+    },
+    {
+      "NatGatewayId": "nat-0b1000000000000003",
+      "AccountId": "444455556666",
+      "AvailabilityZone": "us-east-1c",
+      "Environment": "staging"
+    }
+  ]
+}
