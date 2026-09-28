@@ -14,6 +14,8 @@ dev = [
 ]
 
 [tool.uv]
+exclude-newer = "7 days"
+exclude-newer-package = { ruff = false }
 package = false
 
 [tool.pytest.ini_options]
