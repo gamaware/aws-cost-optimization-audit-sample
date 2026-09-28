@@ -1,0 +1,63 @@
+id,key,account,resource,description,current_usd,target_usd,saving_usd
+SAV-02,rightsize-rds-prod,111122223333,orders-db,db.r5.4xlarge writer and reader to db.r5.2xlarge writer and reader,3387.20,1693.60,1693.60
+SAV-03,rightsize-rds-staging,444455556666,orders-db-stg,db.r5.2xlarge writer and reader to db.r5.large writer only,1693.60,211.70,1481.90
+SAV-01,rightsize-ec2,111122223333,i-0a200000000000001,"app-01: m5.2xlarge to m5.xlarge (max CPU 17%, max memory 34%)",280.32,140.16,140.16
+SAV-01,rightsize-ec2,111122223333,i-0a200000000000002,"app-02: m5.2xlarge to m5.xlarge (max CPU 17%, max memory 34%)",280.32,140.16,140.16
+SAV-01,rightsize-ec2,111122223333,i-0a200000000000003,"app-03: m5.2xlarge to m5.xlarge (max CPU 17%, max memory 34%)",280.32,140.16,140.16
+SAV-01,rightsize-ec2,111122223333,i-0a200000000000004,"app-04: m5.2xlarge to m5.xlarge (max CPU 17%, max memory 34%)",280.32,140.16,140.16
+SAV-01,rightsize-ec2,111122223333,i-0a200000000000005,"app-05: m5.2xlarge to m5.xlarge (max CPU 17%, max memory 34%)",280.32,140.16,140.16
+SAV-01,rightsize-ec2,111122223333,i-0a200000000000006,"app-06: m5.2xlarge to m5.xlarge (max CPU 17%, max memory 34%)",280.32,140.16,140.16
+SAV-04,schedule-staging,444455556666,i-0b100000000000001,stg-app-01 (m5.2xlarge),280.32,99.84,180.48
+SAV-04,schedule-staging,444455556666,i-0b100000000000002,stg-app-02 (m5.2xlarge),280.32,99.84,180.48
+SAV-04,schedule-staging,444455556666,i-0b100000000000003,stg-app-03 (m5.2xlarge),280.32,99.84,180.48
+SAV-04,schedule-staging,444455556666,i-0b100000000000004,stg-app-04 (m5.2xlarge),280.32,99.84,180.48
+SAV-15,compute-savings-plan,111122223333,new Compute Savings Plan,commitment 2.402 USD/hour,2404.75,1753.46,651.29
+SAV-16,rds-reserved-instances,111122223333,orders-db,db.r5.2xlarge writer and reader,1693.60,1185.52,508.08
+SAV-16,rds-reserved-instances,111122223333,reporting-db,db.r5.xlarge writer only,423.40,296.38,127.02
+SAV-11,log-retention,111122223333,/harbor-goods/order-api,"application, never expires to 30 days, 9,000 GB stored to 360 GB",270.00,10.80,259.20
+SAV-11,log-retention,111122223333,/harbor-goods/storefront,"application, never expires to 30 days, 3,600 GB stored to 90 GB",108.00,2.70,105.30
+SAV-11,log-retention,111122223333,/harbor-goods/vpc-flow,"network, never expires to 180 days, 4,800 GB stored to 720 GB",144.00,21.60,122.40
+SAV-11,log-retention,444455556666,/harbor-goods/order-api-stg,"application, never expires to 30 days, 1,800 GB stored to 45 GB",54.00,1.35,52.65
+SAV-05,unattached-ebs,111122223333,vol-0a9000000000000e1,"gp2, 1,000 GiB, left over from the app fleet rebuild",100.00,0.00,100.00
+SAV-05,unattached-ebs,111122223333,vol-0a9000000000000e2,"gp2, 500 GiB, detached test restore",50.00,0.00,50.00
+SAV-05,unattached-ebs,444455556666,vol-0b9000000000000e1,"gp2, 500 GiB, old staging database volume",50.00,0.00,50.00
+SAV-05,unattached-ebs,123456789012,vol-0c9000000000000e1,"gp3, 2,000 GiB, retired build cache",160.00,0.00,160.00
+SAV-05,unattached-ebs,123456789012,vol-0c9000000000000e2,"gp2, 250 GiB, detached from a terminated dev box",25.00,0.00,25.00
+SAV-13,s3-lifecycle,123456789012,harbor-goods-app-logs,"20,000 GB in 40,000,000 objects older than 30 days",460.00,80.00,380.00
+SAV-12,debug-logging,111122223333,/harbor-goods/order-api,"1,200 GB a month ingested, 60% assumed DEBUG",600.00,240.00,360.00
+SAV-10,idle-instances,123456789012,i-0c200000000000004,"dev-04 (t3.large), 1.2% average CPU",60.74,0.00,60.74
+SAV-10,idle-instances,123456789012,vol-0c200000000000004,root volume of dev-04,10.00,0.00,10.00
+SAV-10,idle-instances,123456789012,i-0c200000000000005,"dev-05 (t3.large), 1.2% average CPU",60.74,0.00,60.74
+SAV-10,idle-instances,123456789012,vol-0c200000000000005,root volume of dev-05,10.00,0.00,10.00
+SAV-07,old-snapshots,111122223333,snap-0a1000000000000004,"900 GiB billed, 420 days old",45.00,0.00,45.00
+SAV-07,old-snapshots,111122223333,snap-0a1000000000000006,"650 GiB billed, 610 days old",32.50,0.00,32.50
+SAV-07,old-snapshots,444455556666,snap-0b1000000000000001,"400 GiB billed, 300 days old",20.00,0.00,20.00
+SAV-07,old-snapshots,123456789012,snap-0c1000000000000001,"500 GiB billed, 250 days old",25.00,0.00,25.00
+SAV-06,gp2-to-gp3,111122223333,vol-0a100000000000001,100 GiB (report-01),10.00,8.00,2.00
+SAV-06,gp2-to-gp3,111122223333,vol-0a100000000000002,100 GiB (report-02),10.00,8.00,2.00
+SAV-06,gp2-to-gp3,111122223333,vol-0a100000000000003,100 GiB (report-03),10.00,8.00,2.00
+SAV-06,gp2-to-gp3,111122223333,vol-0a100000000000004,100 GiB (report-04),10.00,8.00,2.00
+SAV-06,gp2-to-gp3,111122223333,vol-0a200000000000001,"500 GiB (app-01), +125 MiB/s",50.00,45.00,5.00
+SAV-06,gp2-to-gp3,111122223333,vol-0a200000000000002,"500 GiB (app-02), +125 MiB/s",50.00,45.00,5.00
+SAV-06,gp2-to-gp3,111122223333,vol-0a200000000000003,"500 GiB (app-03), +125 MiB/s",50.00,45.00,5.00
+SAV-06,gp2-to-gp3,111122223333,vol-0a200000000000004,"500 GiB (app-04), +125 MiB/s",50.00,45.00,5.00
+SAV-06,gp2-to-gp3,111122223333,vol-0a200000000000005,"500 GiB (app-05), +125 MiB/s",50.00,45.00,5.00
+SAV-06,gp2-to-gp3,111122223333,vol-0a200000000000006,"500 GiB (app-06), +125 MiB/s",50.00,45.00,5.00
+SAV-06,gp2-to-gp3,123456789012,vol-0c200000000000001,100 GiB (dev-01),10.00,8.00,2.00
+SAV-06,gp2-to-gp3,123456789012,vol-0c200000000000002,100 GiB (dev-02),10.00,8.00,2.00
+SAV-06,gp2-to-gp3,123456789012,vol-0c200000000000003,100 GiB (dev-03),10.00,8.00,2.00
+SAV-06,gp2-to-gp3,444455556666,vol-0b100000000000001,"500 GiB (stg-app-01), +125 MiB/s",50.00,45.00,5.00
+SAV-06,gp2-to-gp3,444455556666,vol-0b100000000000002,"500 GiB (stg-app-02), +125 MiB/s",50.00,45.00,5.00
+SAV-06,gp2-to-gp3,444455556666,vol-0b100000000000003,"500 GiB (stg-app-03), +125 MiB/s",50.00,45.00,5.00
+SAV-06,gp2-to-gp3,444455556666,vol-0b100000000000004,"500 GiB (stg-app-04), +125 MiB/s",50.00,45.00,5.00
+SAV-06,gp2-to-gp3,444455556666,vol-0b200000000000001,"500 GiB (untagged), +125 MiB/s",50.00,45.00,5.00
+SAV-14,nat-consolidation,444455556666,nat-0b1000000000000002,stg-nat-b hourly charge,32.85,0.00,32.85
+SAV-14,nat-consolidation,444455556666,nat-0b1000000000000003,stg-nat-c hourly charge,32.85,0.00,32.85
+SAV-09,idle-load-balancers,111122223333,legacy-promo-alb,"application, 0 requests in 14 days",16.43,0.00,16.43
+SAV-09,idle-load-balancers,444455556666,stg-legacy-clb,"classic, 0 requests in 14 days",18.25,0.00,18.25
+SAV-08,idle-eip,111122223333,eipalloc-0a1000000000000001,public IP 203.0.113.10,3.65,0.00,3.65
+SAV-08,idle-eip,111122223333,eipalloc-0a1000000000000002,public IP 203.0.113.11,3.65,0.00,3.65
+SAV-08,idle-eip,444455556666,eipalloc-0b1000000000000001,public IP 203.0.113.20,3.65,0.00,3.65
+SAV-08,idle-eip,123456789012,eipalloc-0c1000000000000001,public IP 203.0.113.30,3.65,0.00,3.65
+SAV-13,s3-lifecycle,,adjustment,retrieval fees for 50 GB of reads a month,,,-1.50
+SAV-14,nat-consolidation,,adjustment,cross-AZ transfer for 40 GB moved to the remaining gateway,,,-0.80

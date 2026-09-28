@@ -1,0 +1,190 @@
+{
+  "_about": "Every assumption the audit scripts use. Change a value here and re-run `make evidence` to see its effect on the report. Unit prices approximate us-east-1 on-demand list prices for Linux and Aurora PostgreSQL; a real engagement reads them from the AWS Price List API.",
+  "currency": "USD",
+  "analysis_period": "M3",
+  "trend_periods": [
+    "M1",
+    "M2",
+    "M3"
+  ],
+  "hours_per_month": 730,
+  "unit_prices": {
+    "ec2_hourly": {
+      "m5.xlarge": "0.192",
+      "m5.2xlarge": "0.384",
+      "c5.xlarge": "0.17",
+      "c5.2xlarge": "0.34",
+      "c5.4xlarge": "0.68",
+      "t3.medium": "0.0416",
+      "t3.large": "0.0832"
+    },
+    "aurora_postgresql_price_source": "db.r5 on-demand rates for Aurora PostgreSQL (Aurora Standard) match the AWS Price List API offer file for AmazonRDS in us-east-1, as do Aurora storage (0.10 per GB-month) and I/O (0.20 per million requests), which the rightsizing does not change.",
+    "aurora_postgresql_hourly": {
+      "db.r5.large": "0.29",
+      "db.r5.xlarge": "0.58",
+      "db.r5.2xlarge": "1.16",
+      "db.r5.4xlarge": "2.32"
+    },
+    "ebs_gb_month": {
+      "gp2": "0.10",
+      "gp3": "0.08"
+    },
+    "nat_gateway_hourly": "0.045",
+    "s3_gb_month": {
+      "STANDARD": "0.023",
+      "GLACIER_IR": "0.004"
+    },
+    "s3_lifecycle_transition_per_1000_objects": "0.02",
+    "s3_glacier_ir_retrieval_per_gb": "0.03",
+    "cloudwatch_logs_ingest_per_gb": "0.50",
+    "cloudwatch_logs_storage_gb_month": "0.03",
+    "ebs_snapshot_gb_month": "0.05",
+    "inter_az_transfer_per_gb": "0.02",
+    "gp3_throughput_mibps_month": "0.04"
+  },
+  "idle": {
+    "snapshot_age_threshold_days": 180,
+    "snapshot_retention_tag_key": "retention",
+    "delete_volumes_of_idle_instances": true,
+    "rollback_snapshot_months": 1
+  },
+  "staging_schedule": {
+    "environment": "staging",
+    "applications": [
+      "order-api"
+    ],
+    "hours_per_day": 12,
+    "days_per_week": 5,
+    "weeks_per_year": 52
+  },
+  "compute_savings_plan": {
+    "term": "1 year",
+    "payment_option": "No Upfront",
+    "coverage_target_of_steady_baseline": "0.80",
+    "commitment_increment": "0.001",
+    "baseline_excludes_untagged_resources": true,
+    "discount_source": "Observed on the existing Compute Savings Plan: 1 - commitment / on-demand equivalent covered."
+  },
+  "rds_reserved_instances": {
+    "term": "1 year",
+    "payment_option": "No Upfront",
+    "discount": "0.30",
+    "environments": [
+      "prod"
+    ],
+    "discount_source": "Planning figure, below typical published 1-year No Upfront rates for db.r5 Aurora PostgreSQL. Confirm with the Price List API before purchase."
+  },
+  "cloudwatch_logs": {
+    "retention_days_by_class": {
+      "application": 30,
+      "network": 180
+    },
+    "stored_to_ingested_ratio": "0.30",
+    "debug_share_of_order_api_ingest": "0.60",
+    "debug_log_group": "/harbor-goods/order-api"
+  },
+  "s3_lifecycle": {
+    "bucket": "harbor-goods-app-logs",
+    "transition_after_days": 30,
+    "target_storage_class": "GLACIER_IR",
+    "expected_retrieval_gb_per_month": 50
+  },
+  "nat_consolidation": {
+    "environment": "staging",
+    "keep_gateways": 1
+  },
+  "required_tags": [
+    "application",
+    "environment",
+    "cost-center"
+  ],
+  "ratings": {
+    "rightsize-ec2": {
+      "effort": "Medium",
+      "risk": "Medium",
+      "why": "Instance type change needs a rolling replacement and a load test on memory headroom."
+    },
+    "rightsize-rds-prod": {
+      "effort": "Medium",
+      "risk": "Medium",
+      "why": "Resize the reader, fail over to it, then resize the old writer; schedule it in a maintenance window after a load test."
+    },
+    "rightsize-rds-staging": {
+      "effort": "Low",
+      "risk": "Low",
+      "why": "Staging only; the writer restarts during the class change, and a short outage is acceptable."
+    },
+    "schedule-staging": {
+      "effort": "Low",
+      "risk": "Low",
+      "why": "Instance Scheduler or an EventBridge schedule; staging is idle outside working hours."
+    },
+    "unattached-ebs": {
+      "effort": "Low",
+      "risk": "Low",
+      "why": "Snapshot each volume first, then delete; the snapshot is the rollback."
+    },
+    "gp2-to-gp3": {
+      "effort": "Low",
+      "risk": "Low",
+      "why": "Elastic Volumes change the type online, with no detach and no downtime."
+    },
+    "old-snapshots": {
+      "effort": "Low",
+      "risk": "Low",
+      "why": "Only snapshots older than the threshold, not used by an AMI and without a retention tag."
+    },
+    "idle-eip": {
+      "effort": "Low",
+      "risk": "Low",
+      "why": "Release after confirming no DNS record or allow list points at the address."
+    },
+    "idle-load-balancers": {
+      "effort": "Low",
+      "risk": "Low",
+      "why": "No requests in 14 days; delete after checking DNS."
+    },
+    "idle-instances": {
+      "effort": "Low",
+      "risk": "Low",
+      "why": "No owner tag and about 1% CPU; stop, wait one week for a claim, then terminate."
+    },
+    "log-retention": {
+      "effort": "Low",
+      "risk": "Low",
+      "why": "One setting per log group; export anything under a compliance hold first."
+    },
+    "debug-logging": {
+      "effort": "Medium",
+      "risk": "Low",
+      "why": "Needs an application config change and a release of order-api."
+    },
+    "s3-lifecycle": {
+      "effort": "Low",
+      "risk": "Low",
+      "why": "One lifecycle rule; reads of older logs are rare and remain immediate in Glacier Instant Retrieval."
+    },
+    "nat-consolidation": {
+      "effort": "Medium",
+      "risk": "Low",
+      "why": "Route table changes in staging; an AZ outage would cut staging egress, which is acceptable."
+    },
+    "compute-savings-plan": {
+      "effort": "Low",
+      "risk": "Medium",
+      "why": "A one-year commitment; buy it after rightsizing so it does not lock in oversized usage."
+    },
+    "rds-reserved-instances": {
+      "effort": "Low",
+      "risk": "Medium",
+      "why": "A one-year commitment; buy it after the orders-db resize."
+    }
+  },
+  "quick_win_rule": "effort == Low and risk == Low",
+  "gp3_migration": {
+    "included_throughput_mibps": 125,
+    "match_gp2_throughput_above_gib": 170,
+    "gp2_max_throughput_mibps": 250,
+    "max_size_gib": 1000
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "logGroups": [
+    {
+      "logGroupName": "/harbor-goods/order-api",
+      "accountId": "111122223333",
+      "class": "application",
+      "retentionInDays": null,
+      "monthlyIngestGB": 1200,
+      "storedGB": 9000
+    },
+    {
+      "logGroupName": "/harbor-goods/storefront",
+      "accountId": "111122223333",
+      "class": "application",
+      "retentionInDays": null,
+      "monthlyIngestGB": 300,
+      "storedGB": 3600
+    },
+    {
+      "logGroupName": "/aws/lambda/image-resizer",
+      "accountId": "111122223333",
+      "class": "application",
+      "retentionInDays": 30,
+      "monthlyIngestGB": 40,
+      "storedGB": 200
+    },
+    {
+      "logGroupName": "/harbor-goods/vpc-flow",
+      "accountId": "111122223333",
+      "class": "network",
+      "retentionInDays": null,
+      "monthlyIngestGB": 400,
+      "storedGB": 4800
+    },
+    {
+      "logGroupName": "/harbor-goods/order-api-stg",
+      "accountId": "444455556666",
+      "class": "application",
+      "retentionInDays": null,
+      "monthlyIngestGB": 150,
+      "storedGB": 1800
+    }
+  ]
+}

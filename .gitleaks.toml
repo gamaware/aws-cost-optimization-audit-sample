@@ -1,0 +1,8 @@
+# Default gitleaks rules. The detect-secrets baseline stores only hashes of audited false positives
+# (here, the pinned pandoc checksum in ci.yml), so it is not scanned again.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "detect-secrets baseline holds hashed, audited false positives only"
+paths = ['''^\.secrets\.baseline$''']

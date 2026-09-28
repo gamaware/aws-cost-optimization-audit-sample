@@ -1,0 +1,538 @@
+{
+  "instanceRecommendations": [
+    {
+      "instanceArn": "arn:aws:ec2:us-east-1:111122223333:instance/i-0a100000000000001",
+      "accountId": "111122223333",
+      "instanceName": "report-01",
+      "currentInstanceType": "m5.xlarge",
+      "finding": "Optimized",
+      "lookBackPeriodInDays": 14,
+      "utilizationMetrics": [
+        {
+          "name": "CPU",
+          "statistic": "MAXIMUM",
+          "value": 41.0
+        },
+        {
+          "name": "MEMORY",
+          "statistic": "MAXIMUM",
+          "value": 58.0
+        }
+      ],
+      "recommendationOptions": []
+    },
+    {
+      "instanceArn": "arn:aws:ec2:us-east-1:111122223333:instance/i-0a100000000000002",
+      "accountId": "111122223333",
+      "instanceName": "report-02",
+      "currentInstanceType": "m5.xlarge",
+      "finding": "Optimized",
+      "lookBackPeriodInDays": 14,
+      "utilizationMetrics": [
+        {
+          "name": "CPU",
+          "statistic": "MAXIMUM",
+          "value": 41.0
+        },
+        {
+          "name": "MEMORY",
+          "statistic": "MAXIMUM",
+          "value": 58.0
+        }
+      ],
+      "recommendationOptions": []
+    },
+    {
+      "instanceArn": "arn:aws:ec2:us-east-1:111122223333:instance/i-0a100000000000003",
+      "accountId": "111122223333",
+      "instanceName": "report-03",
+      "currentInstanceType": "m5.xlarge",
+      "finding": "Optimized",
+      "lookBackPeriodInDays": 14,
+      "utilizationMetrics": [
+        {
+          "name": "CPU",
+          "statistic": "MAXIMUM",
+          "value": 41.0
+        },
+        {
+          "name": "MEMORY",
+          "statistic": "MAXIMUM",
+          "value": 58.0
+        }
+      ],
+      "recommendationOptions": []
+    },
+    {
+      "instanceArn": "arn:aws:ec2:us-east-1:111122223333:instance/i-0a100000000000004",
+      "accountId": "111122223333",
+      "instanceName": "report-04",
+      "currentInstanceType": "m5.xlarge",
+      "finding": "Optimized",
+      "lookBackPeriodInDays": 14,
+      "utilizationMetrics": [
+        {
+          "name": "CPU",
+          "statistic": "MAXIMUM",
+          "value": 41.0
+        },
+        {
+          "name": "MEMORY",
+          "statistic": "MAXIMUM",
+          "value": 58.0
+        }
+      ],
+      "recommendationOptions": []
+    },
+    {
+      "instanceArn": "arn:aws:ec2:us-east-1:111122223333:instance/i-0a200000000000001",
+      "accountId": "111122223333",
+      "instanceName": "app-01",
+      "currentInstanceType": "m5.2xlarge",
+      "finding": "Overprovisioned",
+      "lookBackPeriodInDays": 14,
+      "utilizationMetrics": [
+        {
+          "name": "CPU",
+          "statistic": "MAXIMUM",
+          "value": 17.0
+        },
+        {
+          "name": "MEMORY",
+          "statistic": "MAXIMUM",
+          "value": 34.0
+        }
+      ],
+      "recommendationOptions": [
+        {
+          "instanceType": "m5.xlarge",
+          "rank": 1,
+          "performanceRisk": "LOW",
+          "projectedUtilizationMetrics": [
+            {
+              "name": "CPU",
+              "statistic": "MAXIMUM",
+              "value": 34.0
+            }
+          ],
+          "savingsOpportunity": {
+            "estimatedMonthlySavings": {
+              "currency": "USD",
+              "value": 140.16
+            }
+          }
+        }
+      ]
+    },
+    {
+      "instanceArn": "arn:aws:ec2:us-east-1:111122223333:instance/i-0a200000000000002",
+      "accountId": "111122223333",
+      "instanceName": "app-02",
+      "currentInstanceType": "m5.2xlarge",
+      "finding": "Overprovisioned",
+      "lookBackPeriodInDays": 14,
+      "utilizationMetrics": [
+        {
+          "name": "CPU",
+          "statistic": "MAXIMUM",
+          "value": 17.0
+        },
+        {
+          "name": "MEMORY",
+          "statistic": "MAXIMUM",
+          "value": 34.0
+        }
+      ],
+      "recommendationOptions": [
+        {
+          "instanceType": "m5.xlarge",
+          "rank": 1,
+          "performanceRisk": "LOW",
+          "projectedUtilizationMetrics": [
+            {
+              "name": "CPU",
+              "statistic": "MAXIMUM",
+              "value": 34.0
+            }
+          ],
+          "savingsOpportunity": {
+            "estimatedMonthlySavings": {
+              "currency": "USD",
+              "value": 140.16
+            }
+          }
+        }
+      ]
+    },
+    {
+      "instanceArn": "arn:aws:ec2:us-east-1:111122223333:instance/i-0a200000000000003",
+      "accountId": "111122223333",
+      "instanceName": "app-03",
+      "currentInstanceType": "m5.2xlarge",
+      "finding": "Overprovisioned",
+      "lookBackPeriodInDays": 14,
+      "utilizationMetrics": [
+        {
+          "name": "CPU",
+          "statistic": "MAXIMUM",
+          "value": 17.0
+        },
+        {
+          "name": "MEMORY",
+          "statistic": "MAXIMUM",
+          "value": 34.0
+        }
+      ],
+      "recommendationOptions": [
+        {
+          "instanceType": "m5.xlarge",
+          "rank": 1,
+          "performanceRisk": "LOW",
+          "projectedUtilizationMetrics": [
+            {
+              "name": "CPU",
+              "statistic": "MAXIMUM",
+              "value": 34.0
+            }
+          ],
+          "savingsOpportunity": {
+            "estimatedMonthlySavings": {
+              "currency": "USD",
+              "value": 140.16
+            }
+          }
+        }
+      ]
+    },
+    {
+      "instanceArn": "arn:aws:ec2:us-east-1:111122223333:instance/i-0a200000000000004",
+      "accountId": "111122223333",
+      "instanceName": "app-04",
+      "currentInstanceType": "m5.2xlarge",
+      "finding": "Overprovisioned",
+      "lookBackPeriodInDays": 14,
+      "utilizationMetrics": [
+        {
+          "name": "CPU",
+          "statistic": "MAXIMUM",
+          "value": 17.0
+        },
+        {
+          "name": "MEMORY",
+          "statistic": "MAXIMUM",
+          "value": 34.0
+        }
+      ],
+      "recommendationOptions": [
+        {
+          "instanceType": "m5.xlarge",
+          "rank": 1,
+          "performanceRisk": "LOW",
+          "projectedUtilizationMetrics": [
+            {
+              "name": "CPU",
+              "statistic": "MAXIMUM",
+              "value": 34.0
+            }
+          ],
+          "savingsOpportunity": {
+            "estimatedMonthlySavings": {
+              "currency": "USD",
+              "value": 140.16
+            }
+          }
+        }
+      ]
+    },
+    {
+      "instanceArn": "arn:aws:ec2:us-east-1:111122223333:instance/i-0a200000000000005",
+      "accountId": "111122223333",
+      "instanceName": "app-05",
+      "currentInstanceType": "m5.2xlarge",
+      "finding": "Overprovisioned",
+      "lookBackPeriodInDays": 14,
+      "utilizationMetrics": [
+        {
+          "name": "CPU",
+          "statistic": "MAXIMUM",
+          "value": 17.0
+        },
+        {
+          "name": "MEMORY",
+          "statistic": "MAXIMUM",
+          "value": 34.0
+        }
+      ],
+      "recommendationOptions": [
+        {
+          "instanceType": "m5.xlarge",
+          "rank": 1,
+          "performanceRisk": "LOW",
+          "projectedUtilizationMetrics": [
+            {
+              "name": "CPU",
+              "statistic": "MAXIMUM",
+              "value": 34.0
+            }
+          ],
+          "savingsOpportunity": {
+            "estimatedMonthlySavings": {
+              "currency": "USD",
+              "value": 140.16
+            }
+          }
+        }
+      ]
+    },
+    {
+      "instanceArn": "arn:aws:ec2:us-east-1:111122223333:instance/i-0a200000000000006",
+      "accountId": "111122223333",
+      "instanceName": "app-06",
+      "currentInstanceType": "m5.2xlarge",
+      "finding": "Overprovisioned",
+      "lookBackPeriodInDays": 14,
+      "utilizationMetrics": [
+        {
+          "name": "CPU",
+          "statistic": "MAXIMUM",
+          "value": 17.0
+        },
+        {
+          "name": "MEMORY",
+          "statistic": "MAXIMUM",
+          "value": 34.0
+        }
+      ],
+      "recommendationOptions": [
+        {
+          "instanceType": "m5.xlarge",
+          "rank": 1,
+          "performanceRisk": "LOW",
+          "projectedUtilizationMetrics": [
+            {
+              "name": "CPU",
+              "statistic": "MAXIMUM",
+              "value": 34.0
+            }
+          ],
+          "savingsOpportunity": {
+            "estimatedMonthlySavings": {
+              "currency": "USD",
+              "value": 140.16
+            }
+          }
+        }
+      ]
+    },
+    {
+      "instanceArn": "arn:aws:ec2:us-east-1:111122223333:instance/i-0a300000000000001",
+      "accountId": "111122223333",
+      "instanceName": "batch-01",
+      "currentInstanceType": "c5.4xlarge",
+      "finding": "Optimized",
+      "lookBackPeriodInDays": 14,
+      "utilizationMetrics": [
+        {
+          "name": "CPU",
+          "statistic": "MAXIMUM",
+          "value": 88.0
+        },
+        {
+          "name": "MEMORY",
+          "statistic": "MAXIMUM",
+          "value": 61.0
+        }
+      ],
+      "recommendationOptions": []
+    },
+    {
+      "instanceArn": "arn:aws:ec2:us-east-1:111122223333:instance/i-0a300000000000002",
+      "accountId": "111122223333",
+      "instanceName": "batch-02",
+      "currentInstanceType": "c5.4xlarge",
+      "finding": "Optimized",
+      "lookBackPeriodInDays": 14,
+      "utilizationMetrics": [
+        {
+          "name": "CPU",
+          "statistic": "MAXIMUM",
+          "value": 88.0
+        },
+        {
+          "name": "MEMORY",
+          "statistic": "MAXIMUM",
+          "value": 61.0
+        }
+      ],
+      "recommendationOptions": []
+    },
+    {
+      "instanceArn": "arn:aws:ec2:us-east-1:111122223333:instance/i-0a300000000000003",
+      "accountId": "111122223333",
+      "instanceName": "batch-03",
+      "currentInstanceType": "c5.4xlarge",
+      "finding": "Optimized",
+      "lookBackPeriodInDays": 14,
+      "utilizationMetrics": [
+        {
+          "name": "CPU",
+          "statistic": "MAXIMUM",
+          "value": 88.0
+        },
+        {
+          "name": "MEMORY",
+          "statistic": "MAXIMUM",
+          "value": 61.0
+        }
+      ],
+      "recommendationOptions": []
+    },
+    {
+      "instanceArn": "arn:aws:ec2:us-east-1:111122223333:instance/i-0a300000000000004",
+      "accountId": "111122223333",
+      "instanceName": "batch-04",
+      "currentInstanceType": "c5.4xlarge",
+      "finding": "Optimized",
+      "lookBackPeriodInDays": 14,
+      "utilizationMetrics": [
+        {
+          "name": "CPU",
+          "statistic": "MAXIMUM",
+          "value": 88.0
+        },
+        {
+          "name": "MEMORY",
+          "statistic": "MAXIMUM",
+          "value": 61.0
+        }
+      ],
+      "recommendationOptions": []
+    },
+    {
+      "instanceArn": "arn:aws:ec2:us-east-1:444455556666:instance/i-0b100000000000001",
+      "accountId": "444455556666",
+      "instanceName": "stg-app-01",
+      "currentInstanceType": "m5.2xlarge",
+      "finding": "Optimized",
+      "lookBackPeriodInDays": 14,
+      "utilizationMetrics": [
+        {
+          "name": "CPU",
+          "statistic": "MAXIMUM",
+          "value": 65.0
+        },
+        {
+          "name": "MEMORY",
+          "statistic": "MAXIMUM",
+          "value": 48.0
+        }
+      ],
+      "recommendationOptions": []
+    },
+    {
+      "instanceArn": "arn:aws:ec2:us-east-1:444455556666:instance/i-0b100000000000002",
+      "accountId": "444455556666",
+      "instanceName": "stg-app-02",
+      "currentInstanceType": "m5.2xlarge",
+      "finding": "Optimized",
+      "lookBackPeriodInDays": 14,
+      "utilizationMetrics": [
+        {
+          "name": "CPU",
+          "statistic": "MAXIMUM",
+          "value": 65.0
+        },
+        {
+          "name": "MEMORY",
+          "statistic": "MAXIMUM",
+          "value": 48.0
+        }
+      ],
+      "recommendationOptions": []
+    },
+    {
+      "instanceArn": "arn:aws:ec2:us-east-1:444455556666:instance/i-0b100000000000003",
+      "accountId": "444455556666",
+      "instanceName": "stg-app-03",
+      "currentInstanceType": "m5.2xlarge",
+      "finding": "Optimized",
+      "lookBackPeriodInDays": 14,
+      "utilizationMetrics": [
+        {
+          "name": "CPU",
+          "statistic": "MAXIMUM",
+          "value": 65.0
+        },
+        {
+          "name": "MEMORY",
+          "statistic": "MAXIMUM",
+          "value": 48.0
+        }
+      ],
+      "recommendationOptions": []
+    },
+    {
+      "instanceArn": "arn:aws:ec2:us-east-1:444455556666:instance/i-0b100000000000004",
+      "accountId": "444455556666",
+      "instanceName": "stg-app-04",
+      "currentInstanceType": "m5.2xlarge",
+      "finding": "Optimized",
+      "lookBackPeriodInDays": 14,
+      "utilizationMetrics": [
+        {
+          "name": "CPU",
+          "statistic": "MAXIMUM",
+          "value": 65.0
+        },
+        {
+          "name": "MEMORY",
+          "statistic": "MAXIMUM",
+          "value": 48.0
+        }
+      ],
+      "recommendationOptions": []
+    },
+    {
+      "instanceArn": "arn:aws:ec2:us-east-1:123456789012:instance/i-0c100000000000001",
+      "accountId": "123456789012",
+      "instanceName": "ci-runner-01",
+      "currentInstanceType": "c5.xlarge",
+      "finding": "Optimized",
+      "lookBackPeriodInDays": 14,
+      "utilizationMetrics": [
+        {
+          "name": "CPU",
+          "statistic": "MAXIMUM",
+          "value": 92.0
+        },
+        {
+          "name": "MEMORY",
+          "statistic": "MAXIMUM",
+          "value": 40.0
+        }
+      ],
+      "recommendationOptions": []
+    },
+    {
+      "instanceArn": "arn:aws:ec2:us-east-1:123456789012:instance/i-0c100000000000002",
+      "accountId": "123456789012",
+      "instanceName": "ci-runner-02",
+      "currentInstanceType": "c5.xlarge",
+      "finding": "Optimized",
+      "lookBackPeriodInDays": 14,
+      "utilizationMetrics": [
+        {
+          "name": "CPU",
+          "statistic": "MAXIMUM",
+          "value": 92.0
+        },
+        {
+          "name": "MEMORY",
+          "statistic": "MAXIMUM",
+          "value": 40.0
+        }
+      ],
+      "recommendationOptions": []
+    }
+  ]
+}

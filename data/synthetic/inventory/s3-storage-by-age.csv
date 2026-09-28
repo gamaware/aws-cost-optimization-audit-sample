@@ -1,0 +1,5 @@
+bucket,storage_class,age_band_days,size_gb,object_count
+harbor-goods-app-logs,STANDARD,0-30,2000,4000000
+harbor-goods-app-logs,STANDARD,31-90,4000,8000000
+harbor-goods-app-logs,STANDARD,91-365,12000,24000000
+harbor-goods-app-logs,STANDARD,366+,4000,8000000

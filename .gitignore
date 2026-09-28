@@ -1,0 +1,27 @@
+# Secrets and credentials
+.env
+.env.local
+.env.*
+*.p12
+.aws/
+*.pem
+*.key
+credentials.json
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# Tooling
+.claude/settings.local.json
+.firecrawl/
+.claude-flow/
+.claude/proven-config*
+styles/
+.DS_Store
+
+# Live test output is never committed
+live-output/
