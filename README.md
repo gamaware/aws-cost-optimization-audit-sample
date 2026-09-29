@@ -68,6 +68,8 @@ Acceptance requires the following:
 
 ## Architecture
 
+![Animated flow from cost exports to ranked savings](docs/diagrams/architecture-animated.svg)
+
 ![Context view: AWS exports feed offline audit scripts, evidence, report and tests](docs/diagrams/audit-context.png)
 
 A deterministic generator creates billing lines, Compute Optimizer findings, and Trusted Advisor

@@ -16,10 +16,7 @@ __pycache__/
 .ruff_cache/
 
 # Tooling
-.claude/settings.local.json
 .firecrawl/
-.claude-flow/
-.claude/proven-config*
 styles/
 .DS_Store
 
