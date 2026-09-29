@@ -10,7 +10,16 @@ from __future__ import annotations
 from dataclasses import dataclass
 from decimal import Decimal
 
-from .findings import Detail, Finding, aurora_layout, floor_to, rds_target_cost
+from .findings import (
+    Detail,
+    Finding,
+    aurora_instances,
+    aurora_layout,
+    aurora_target_instances,
+    floor_to,
+    rds_clusters,
+    rds_target_cost,
+)
 from .model import D, Dataset
 
 
@@ -141,16 +150,15 @@ def rds_ri_finding(ds: Dataset) -> Finding:
         "commitment",
         basis="Post-rightsizing instance-hour cost (storage excluded) x the planning discount.",
     )
-    for rec in ds.rds_recs:
-        arn = rec["resourceArn"]
+    for arn, rec in rds_clusters(ds):
         if env_of.get(arn) not in cfg["environments"] or arn in reserved or seen.get(arn) != periods:
             continue  # other environments, already reserved, or not steady across the trend window
+        name = rec["dbClusterIdentifier"]
         if rec["instanceFinding"] == "Overprovisioned":
             opt = next(o for o in rec["instanceRecommendationOptions"] if o["rank"] == 1)
-            cls, multi = opt["dbInstanceClass"], opt["multiAZ"]
+            cls, instances = opt["dbInstanceClass"], aurora_target_instances(ds, name, arn)
         else:
-            cls, multi = rec["currentDBInstanceClass"], rec["multiAZ"]
-        od = rds_target_cost(ds, cls, multi)
-        name = rec["resourceArn"].rsplit(":", 1)[1]
-        f.details.append(Detail(rec["accountId"], name, f"{cls} {aurora_layout(multi)}", od, od * (1 - discount)))
+            cls, instances = rec["currentDBInstanceClass"], aurora_instances(ds, arn)
+        od = rds_target_cost(ds, cls, instances)
+        f.details.append(Detail(rec["accountId"], name, f"{cls} {aurora_layout(instances)}", od, od * (1 - discount)))
     return f

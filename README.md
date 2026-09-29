@@ -16,13 +16,13 @@ An offline AWS cost audit of a fictional retailer's billing data, with ranked sa
 
 Monthly AWS spending across Harbor Goods' three accounts totals $24,502.82, up 9.8% from two
 months earlier. Across 16 opportunities, the audit estimates savings of
-**$8,134.97 a month ($97,619.64 a year)**, equivalent to 33.2% of the bill.
+**$8,054.97 a month ($96,659.64 a year)**, equivalent to 32.9% of the bill.
 
 | Group | Items | Estimated monthly saving |
 | --- | ---: | ---: |
-| Quick wins (low effort, low risk) | 10 | $3,889.12 |
+| Quick wins (low effort, low risk) | 10 | $3,809.12 |
 | Planned work (load test, release or commitment) | 6 | $4,245.85 |
-| **Total** | **16** | **$8,134.97** |
+| **Total** | **16** | **$8,054.97** |
 
 The three highest-ranked recommendations and their estimated monthly savings are:
 
@@ -140,7 +140,7 @@ Architecture decision records follow the *Fundamentals of Software Architecture*
 | `make verify`: ruff, pytest, freshness of data, evidence, report and PDF | local and CI | The report can never disagree with the data |
 | markdownlint | pre-commit and shared `lint-docs` workflow | Consistent, readable Markdown |
 | lychee link check, Vale prose lint | shared `lint-docs` workflow | Working links, plain prose |
-| actionlint, zizmor | pre-commit and shared `lint-actions` workflow | Safe workflows: SHA pins, least privilege |
+| actionlint, zizmor | pre-commit and shared `lint-actions` workflow | Safe workflows: SHA pins, scoped token permissions |
 | gitleaks, detect-secrets | pre-commit and shared `secrets` workflow | No credentials in a public repo |
 | Semgrep, Trivy, Checkov | shared `security` workflow | Code, dependency and configuration scanning |
 | Evidence regeneration and PDF render with the pinned pandoc LaTeX image | shared `report` workflow | Evidence reproduces from the committed scripts; the report renders |

@@ -7,6 +7,7 @@ from decimal import Decimal
 from pathlib import Path
 
 import generate_synthetic
+from costaudit.findings import rds_clusters
 from costaudit.model import ROOT
 
 SYNTHETIC = ROOT / "data" / "synthetic"
@@ -60,8 +61,8 @@ def test_every_flagged_resource_is_billed(ds):
             assert r["resourceId"] in billed or r["resourceId"] in billed_names, (check, r["resourceId"])
     for rec in ds.ec2_recs:
         assert rec["instanceArn"].rsplit("/", 1)[1] in billed
-    for rec in ds.rds_recs:
-        assert rec["resourceArn"] in billed
+    for arn, _ in rds_clusters(ds):
+        assert arn in billed
 
 
 def test_log_group_inventory_matches_billed_usage(ds):

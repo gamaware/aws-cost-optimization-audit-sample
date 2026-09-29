@@ -24,3 +24,12 @@ releases are revisions of the report rather than SemVer releases of an API.
 - The storefront web tier is modelled on ECS Fargate, as in the other Harbor Goods samples. The four
   `m5.xlarge` instances under the existing Savings Plan now belong to a reporting worker fleet, and the
   Fargate tasks count as Savings Plans eligible spend. Data, evidence, report and PDF were regenerated.
+
+### Fixed
+
+- The S3 lifecycle estimate now deducts the recurring transition requests for objects that reach the
+  transition age each month, not only the one-time backlog. Monthly savings drop by $80.00.
+- The Compute Optimizer RDS fixture carries only fields the real API returns. The current Aurora layout
+  comes from CUR instance-hours and the target layout from `data/assumptions.json`.
+- With `delete_volumes_of_idle_instances` set to false, idle-instance savings no longer include the root
+  volumes, which the gp2 to gp3 change then prices instead of counting them twice.

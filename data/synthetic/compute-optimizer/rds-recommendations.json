@@ -1,11 +1,11 @@
 {
   "rdsDBRecommendations": [
     {
-      "resourceArn": "arn:aws:rds:us-east-1:111122223333:cluster:orders-db",
+      "resourceArn": "arn:aws:rds:us-east-1:111122223333:db:orders-db-instance-1",
       "accountId": "111122223333",
       "engine": "aurora-postgresql",
+      "dbClusterIdentifier": "orders-db",
       "currentDBInstanceClass": "db.r5.4xlarge",
-      "multiAZ": true,
       "instanceFinding": "Overprovisioned",
       "lookBackPeriodInDays": 14,
       "utilizationMetrics": [
@@ -18,18 +18,40 @@
       "instanceRecommendationOptions": [
         {
           "dbInstanceClass": "db.r5.2xlarge",
-          "multiAZ": true,
           "rank": 1,
           "performanceRisk": "LOW"
         }
       ]
     },
     {
-      "resourceArn": "arn:aws:rds:us-east-1:111122223333:cluster:reporting-db",
+      "resourceArn": "arn:aws:rds:us-east-1:111122223333:db:orders-db-instance-2",
       "accountId": "111122223333",
       "engine": "aurora-postgresql",
+      "dbClusterIdentifier": "orders-db",
+      "currentDBInstanceClass": "db.r5.4xlarge",
+      "instanceFinding": "Overprovisioned",
+      "lookBackPeriodInDays": 14,
+      "utilizationMetrics": [
+        {
+          "name": "CPU",
+          "statistic": "MAXIMUM",
+          "value": 22.0
+        }
+      ],
+      "instanceRecommendationOptions": [
+        {
+          "dbInstanceClass": "db.r5.2xlarge",
+          "rank": 1,
+          "performanceRisk": "LOW"
+        }
+      ]
+    },
+    {
+      "resourceArn": "arn:aws:rds:us-east-1:111122223333:db:reporting-db-instance-1",
+      "accountId": "111122223333",
+      "engine": "aurora-postgresql",
+      "dbClusterIdentifier": "reporting-db",
       "currentDBInstanceClass": "db.r5.xlarge",
-      "multiAZ": false,
       "instanceFinding": "Optimized",
       "lookBackPeriodInDays": 14,
       "utilizationMetrics": [
@@ -42,11 +64,11 @@
       "instanceRecommendationOptions": []
     },
     {
-      "resourceArn": "arn:aws:rds:us-east-1:444455556666:cluster:orders-db-stg",
+      "resourceArn": "arn:aws:rds:us-east-1:444455556666:db:orders-db-stg-instance-1",
       "accountId": "444455556666",
       "engine": "aurora-postgresql",
+      "dbClusterIdentifier": "orders-db-stg",
       "currentDBInstanceClass": "db.r5.2xlarge",
-      "multiAZ": true,
       "instanceFinding": "Overprovisioned",
       "lookBackPeriodInDays": 14,
       "utilizationMetrics": [
@@ -59,7 +81,29 @@
       "instanceRecommendationOptions": [
         {
           "dbInstanceClass": "db.r5.large",
-          "multiAZ": false,
+          "rank": 1,
+          "performanceRisk": "LOW"
+        }
+      ]
+    },
+    {
+      "resourceArn": "arn:aws:rds:us-east-1:444455556666:db:orders-db-stg-instance-2",
+      "accountId": "444455556666",
+      "engine": "aurora-postgresql",
+      "dbClusterIdentifier": "orders-db-stg",
+      "currentDBInstanceClass": "db.r5.2xlarge",
+      "instanceFinding": "Overprovisioned",
+      "lookBackPeriodInDays": 14,
+      "utilizationMetrics": [
+        {
+          "name": "CPU",
+          "statistic": "MAXIMUM",
+          "value": 6.0
+        }
+      ],
+      "instanceRecommendationOptions": [
+        {
+          "dbInstanceClass": "db.r5.large",
           "rank": 1,
           "performanceRisk": "LOW"
         }

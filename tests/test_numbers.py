@@ -72,8 +72,9 @@ EXPECTED = {
     * ((9000 - 1200 * d("0.3")) + (3600 - 300 * d("0.3")) + (4800 - 400 * d("0.3") * 6) + (1800 - 150 * d("0.3"))),
     # 60% of 1,200 GB ingested at 0.50 per GB.
     "debug-logging": 1200 * d("0.6") * d("0.50"),
-    # 20,000 GB older than 30 days from 0.023 to 0.004, less 50 GB of retrievals at 0.03.
-    "s3-lifecycle": 20000 * (d("0.023") - d("0.004")) - 50 * d("0.03"),
+    # 20,000 GB older than 30 days from 0.023 to 0.004, less 50 GB of retrievals at 0.03 and the
+    # 4,000,000 objects a month that reach 30 days, transitioned at 0.02 per 1,000.
+    "s3-lifecycle": 20000 * (d("0.023") - d("0.004")) - 50 * d("0.03") - 4_000_000 / Decimal(1000) * d("0.02"),
     # Two of three staging NAT gateways, less 40 GB moved cross-AZ at 0.02.
     "nat-consolidation": 2 * H * d("0.045") - 40 * d("0.02"),
     # Production after resize: orders-db writer and reader at 2 x 1.16/h, reporting-db at 0.58/h, 30% discount.
@@ -126,3 +127,86 @@ def test_tag_coverage(ds):
     assert by_tag["environment"].untagged - by_tag["application"].untagged == 2 * H * d("0.216")
     # cost-center also misses CloudFront (30,000 GB x 0.085) and the ElastiCache nodes are tagged.
     assert by_tag["cost-center"].untagged - by_tag["application"].untagged == 30000 * d("0.085")
+
+
+def test_keeping_idle_instance_volumes_moves_them_to_gp3(ds):
+    """With the volume flag off, the root volumes are neither deleted nor counted twice."""
+    from copy import deepcopy
+
+    from costaudit import analysis
+
+    kept = deepcopy(ds)
+    kept.assumptions["idle"]["delete_volumes_of_idle_instances"] = False
+    audit = analysis.run(kept)
+    idle = audit.by_key("idle-instances").finding
+    gp3 = audit.by_key("gp2-to-gp3").finding
+    assert idle.monthly == money(2 * H * d("0.0832"))
+    assert idle.basis == "Instance hours billed in the analysis period."
+    assert not set(idle.resources) & set(gp3.resources)
+    assert gp3.monthly == money(EXPECTED["gp2-to-gp3"] + 2 * 100 * (d("0.10") - d("0.08")))
+
+
+def test_aurora_layout_comes_from_the_cur(ds):
+    from costaudit import findings
+
+    arn = "arn:aws:rds:us-east-1:{}:cluster:{}"
+    assert findings.aurora_instances(ds, arn.format("111122223333", "orders-db")) == 2
+    assert findings.aurora_instances(ds, arn.format("111122223333", "reporting-db")) == 1
+    assert findings.aurora_target_instances(ds, "orders-db-stg", arn.format("444455556666", "orders-db-stg")) == 1
+    assert all("multiAZ" not in rec for rec in ds.rds_recs)
+
+
+def test_rds_recommendations_resolve_to_clusters_by_identifier(ds):
+    """Compute Optimizer names DB instances; the cluster (and its target count) comes from dbClusterIdentifier."""
+    from costaudit import findings
+
+    assert all(":db:" in rec["resourceArn"] for rec in ds.rds_recs)
+    stg = [rec for rec in ds.rds_recs if rec["dbClusterIdentifier"] == "orders-db-stg"]
+    assert len(stg) == 2  # writer and reader, one recommendation each
+    clusters = dict(findings.rds_clusters(ds))
+    assert set(clusters) == {
+        "arn:aws:rds:us-east-1:111122223333:cluster:orders-db",
+        "arn:aws:rds:us-east-1:111122223333:cluster:reporting-db",
+        "arn:aws:rds:us-east-1:444455556666:cluster:orders-db-stg",
+    }
+    staging = findings.rightsize_rds(ds, "staging")
+    assert [d.resource for d in staging.details] == ["orders-db-stg"]
+    assert staging.details[0].target == money(H * d("0.29"))  # one db.r5.large: the reader is removed
+
+
+def test_rds_cluster_instances_must_agree(ds):
+    import copy
+
+    from costaudit import findings
+
+    bad = copy.copy(ds)
+    bad.rds_recs = copy.deepcopy(ds.rds_recs)
+    reader = next(r for r in bad.rds_recs if r["resourceArn"].endswith("orders-db-stg-instance-2"))
+    reader["instanceRecommendationOptions"][0]["dbInstanceClass"] = "db.r5.xlarge"
+    with pytest.raises(ValueError, match="disagree"):
+        findings.rds_clusters(bad)
+
+
+def test_rds_cluster_needs_a_recommendation_per_billed_instance(ds):
+    import copy
+
+    from costaudit import findings
+
+    partial = copy.copy(ds)
+    partial.rds_recs = [r for r in ds.rds_recs if not r["resourceArn"].endswith("orders-db-stg-instance-2")]
+    with pytest.raises(ValueError, match="1 instance recommendations for 2 billed instances"):
+        findings.rds_clusters(partial)
+
+
+@pytest.mark.parametrize("count", [0, -1, 1.5, "1", True])
+def test_aurora_target_count_must_be_a_positive_whole_number(ds, count):
+    import copy
+
+    from costaudit import findings
+
+    bad = copy.copy(ds)
+    bad.assumptions = copy.deepcopy(ds.assumptions)
+    bad.assumptions["aurora_target_instances"]["orders-db-stg"] = count
+    arn = "arn:aws:rds:us-east-1:444455556666:cluster:orders-db-stg"
+    with pytest.raises(ValueError, match="positive whole number"):
+        findings.aurora_target_instances(bad, "orders-db-stg", arn)

@@ -20,11 +20,11 @@
 
 AWS spending for Harbor Goods reached $24,502.82 in M3, an increase of
 9.8% ($2,194.08) from M1. Across 16 opportunities,
-the audit estimates savings of **$8,134.97 a month ($97,619.64 a year)**,
-equivalent to 33.2% of the M3 bill. Completing every recommendation would bring
-monthly costs for the same workload to approximately $16,367.85.
+the audit estimates savings of **$8,054.97 a month ($96,659.64 a year)**,
+equivalent to 32.9% of the M3 bill. Completing every recommendation would bring
+monthly costs for the same workload to approximately $16,447.85.
 
-- **10 quick wins** offer $3,889.12 in monthly savings at low effort and low
+- **10 quick wins** offer $3,809.12 in monthly savings at low effort and low
   risk. Most involve removing idle resources or changing a single setting; a platform engineer can
   complete these within a week.
 - **6 planned items** offer $4,245.85 in monthly savings. Each requires
@@ -116,19 +116,19 @@ calculations for individual resources.
 | 6 | SAV-16 | Buy one-year RDS Reserved Instances for production after the resize | $635.10 | $7,621.20 | none | Low | Medium | Planned work |
 | 7 | SAV-11 | Set CloudWatch Logs retention on groups that never expire | $539.55 | $6,474.60 | none | Low | Low | Quick win |
 | 8 | SAV-05 | Delete unattached EBS volumes after a rollback snapshot | $385.00 | $4,620.00 | $212.50 | Low | Low | Quick win |
-| 9 | SAV-13 | Move application logs older than 30 days to S3 Glacier Instant Retrieval | $378.50 | $4,542.00 | $800.00 | Low | Low | Quick win |
-| 10 | SAV-12 | Turn off DEBUG logging in production order-api | $360.00 | $4,320.00 | none | Medium | Low | Planned work |
+| 9 | SAV-12 | Turn off DEBUG logging in production order-api | $360.00 | $4,320.00 | none | Medium | Low | Planned work |
+| 10 | SAV-13 | Move application logs older than 30 days to S3 Glacier Instant Retrieval | $298.50 | $3,582.00 | $800.00 | Low | Low | Quick win |
 | 11 | SAV-10 | Stop, then terminate idle untagged instances | $141.47 | $1,697.64 | none | Low | Low | Quick win |
 | 12 | SAV-07 | Delete EBS snapshots older than 180 days | $122.50 | $1,470.00 | none | Low | Low | Quick win |
 | 13 | SAV-06 | Change attached gp2 volumes to gp3 | $69.00 | $828.00 | none | Low | Low | Quick win |
 | 14 | SAV-14 | Consolidate staging NAT gateways to one | $64.90 | $778.80 | none | Medium | Low | Planned work |
 | 15 | SAV-09 | Delete idle load balancers | $34.68 | $416.16 | none | Low | Low | Quick win |
 | 16 | SAV-08 | Release unassociated Elastic IP addresses | $14.60 | $175.20 | none | Low | Low | Quick win |
-| | | **Total** | **$8,134.97** | **$97,619.64** | **$1,012.50** | | | |
+| | | **Total** | **$8,054.97** | **$96,659.64** | **$1,012.50** | | | |
 
 ## 5. Quick wins versus planned work
 
-**Quick wins: $3,889.12 monthly ($46,669.44 annually).** Complete these before planned
+**Quick wins: $3,809.12 monthly ($45,709.44 annually).** Complete these before planned
 work, following rank order within a single change window. Every item either supports a direct
 reversal or retains a snapshot until validation confirms the change.
 
@@ -138,7 +138,7 @@ reversal or retains a snapshot until validation confirms the change.
 | SAV-04 | Run staging order-api instances on a working-hours schedule | $721.92 | Instance Scheduler or an EventBridge schedule; staging is idle outside working hours. |
 | SAV-11 | Set CloudWatch Logs retention on groups that never expire | $539.55 | One setting per log group; export anything under a compliance hold first. |
 | SAV-05 | Delete unattached EBS volumes after a rollback snapshot | $385.00 | Snapshot each volume first, then delete; the snapshot is the rollback. |
-| SAV-13 | Move application logs older than 30 days to S3 Glacier Instant Retrieval | $378.50 | One lifecycle rule; reads of older logs are rare and remain immediate in Glacier Instant Retrieval. |
+| SAV-13 | Move application logs older than 30 days to S3 Glacier Instant Retrieval | $298.50 | One lifecycle rule; reads of older logs are rare and remain immediate in Glacier Instant Retrieval. |
 | SAV-10 | Stop, then terminate idle untagged instances | $141.47 | No owner tag and about 1% CPU; stop, wait one week for a claim, then terminate. |
 | SAV-07 | Delete EBS snapshots older than 180 days | $122.50 | Only snapshots older than the threshold, not used by an AMI and without a retention tag. |
 | SAV-06 | Change attached gp2 volumes to gp3 | $69.00 | Elastic Volumes change the type online, with no detach and no downtime. |
@@ -317,7 +317,7 @@ for the decision and purchase.
 | SAV-11 | `444455556666` | `/harbor-goods/order-api-stg` | application, never expires to 30 days, 1,800 GB stored to 45 GB | $54.00 | $1.35 | $52.65 |
 | SAV-12 | `111122223333` | `/harbor-goods/order-api` | 1,200 GB a month ingested, 60% assumed DEBUG | $600.00 | $240.00 | $360.00 |
 | SAV-13 | `123456789012` | `harbor-goods-app-logs` | 20,000 GB in 40,000,000 objects older than 30 days | $460.00 | $80.00 | $380.00 |
-| SAV-13 | | | Less retrieval fees for 50 GB of reads a month | | | -$1.50 |
+| SAV-13 | | | Less retrieval fees for 50 GB of reads and transition requests for 4,000,000 new objects a month | | | -$81.50 |
 | SAV-14 | `444455556666` | `nat-0b1000000000000002` | stg-nat-b hourly charge | $32.85 | $0.00 | $32.85 |
 | SAV-14 | `444455556666` | `nat-0b1000000000000003` | stg-nat-c hourly charge | $32.85 | $0.00 | $32.85 |
 | SAV-14 | | | Less cross-AZ transfer for 40 GB moved to the remaining gateway | | | -$0.80 |
@@ -332,8 +332,9 @@ for the decision and purchase.
   query before release. Excluding the storage impact keeps the savings estimate conservative.
 - **S3 lifecycle (SAV-13).** Transition log objects after 30 days to
   S3 Glacier Instant Retrieval, preserving millisecond read access. Estimated savings deduct the
-  cost of 50 GB in monthly reads. A one-time transition-request expense of
-  $800.00 pays back over 2.1 months.
+  cost of 50 GB in monthly reads and the recurring transition requests for objects
+  that reach that age each month. Moving the existing backlog is a one-time transition-request
+  expense of $800.00, which pays back over 2.7 months.
 - **gp2 to gp3 (SAV-06).** Convert 18 attached gp2 volumes online.
   All are at or below 1,000 GiB, so the included gp3 capacity of 3,000 IOPS meets or exceeds their
   gp2 baseline. Volumes larger than 170 GiB receive additional provisioned throughput to preserve

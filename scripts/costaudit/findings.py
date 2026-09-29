@@ -137,11 +137,14 @@ def idle_instance_volumes(ds: Dataset) -> set[str]:
 
 def idle_instances(ds: Dataset) -> Finding:
     costs = ds.cost_by_resource()
+    volumes = idle_instance_volumes(ds)
     f = Finding(
         "idle-instances",
         "Stop, then terminate idle untagged instances",
         "idle",
-        basis="Instance hours plus attached volumes billed in the analysis period.",
+        basis="Instance hours plus attached volumes billed in the analysis period."
+        if ds.assumptions["idle"]["delete_volumes_of_idle_instances"]
+        else "Instance hours billed in the analysis period.",
     )
     for r in _flagged(ds, "Low Utilization Amazon EC2 Instances"):
         meta = r["metadata"]
@@ -154,7 +157,7 @@ def idle_instances(ds: Dataset) -> Finding:
                 Decimal(0),
             )
         )
-        for vol in meta["attachedVolumes"]:
+        for vol in (v for v in meta["attachedVolumes"] if v in volumes):
             f.details.append(
                 Detail(r["accountId"], vol, f"root volume of {meta['instanceName']}", costs[vol], Decimal(0))
             )
@@ -233,14 +236,77 @@ def rightsize_ec2(ds: Dataset) -> Finding:
     return f
 
 
-def rds_target_cost(ds: Dataset, cls: str, multi_az: bool) -> Decimal:
-    """Monthly on-demand instance cost of an Aurora cluster: a writer, plus a reader when Multi-AZ."""
-    instances = 2 if multi_az else 1
+def aurora_instances(ds: Dataset, arn: str) -> int:
+    """Instances in an Aurora cluster: its instance-hours in the analysis period over the hours in a month."""
+    hours = sum(
+        (ln.usage for ln in ds.current() if ln.resource == arn and ln.usage_type.startswith("InstanceUsage:")),
+        Decimal(0),
+    )
+    count = hours / ds.hours
+    if count != count.to_integral_value() or count < 1:
+        raise ValueError(f"{arn}: {hours} instance-hours is not a whole number of instances")
+    return int(count)
+
+
+def aurora_target_instances(ds: Dataset, cluster_id: str, arn: str) -> int:
+    """Instances after the change: the current count unless data/assumptions.json removes readers."""
+    targets = {k: v for k, v in ds.assumptions["aurora_target_instances"].items() if not k.startswith("_")}
+    if cluster_id not in targets:
+        return aurora_instances(ds, arn)
+    count = targets[cluster_id]
+    if isinstance(count, bool) or not isinstance(count, int) or count < 1:
+        raise ValueError(f"{cluster_id}: target instance count {count!r} is not a positive whole number")
+    return count
+
+
+def rds_cluster_arn(rec: dict) -> str:
+    """The Aurora cluster ARN for a Compute Optimizer RDS recommendation.
+
+    Compute Optimizer returns one recommendation per DB instance, so resourceArn names a
+    writer or reader instance; cluster membership comes only from dbClusterIdentifier.
+    """
+    region = rec["resourceArn"].split(":")[3]
+    return f"arn:aws:rds:{region}:{rec['accountId']}:cluster:{rec['dbClusterIdentifier']}"
+
+
+def _rank1_class(rec: dict) -> str | None:
+    return next((o["dbInstanceClass"] for o in rec["instanceRecommendationOptions"] if o["rank"] == 1), None)
+
+
+def rds_clusters(ds: Dataset) -> list[tuple[str, dict]]:
+    """(cluster ARN, recommendation) once per Aurora cluster, from the per-instance recommendations.
+
+    The audit resizes every instance of a cluster to one class, so all instances of a cluster
+    must agree on the finding and the rank-1 class, and every instance billed in the CUR must
+    have a recommendation; a disagreement or a partial cluster raises instead of guessing.
+    """
+    clusters: dict[str, dict] = {}
+    members: dict[str, set[str]] = {}
+    for rec in ds.rds_recs:
+        if "dbClusterIdentifier" not in rec:
+            raise ValueError(f"{rec['resourceArn']}: not an Aurora cluster member")
+        arn = rds_cluster_arn(rec)
+        first = clusters.setdefault(arn, rec)
+        members.setdefault(arn, set()).add(rec["resourceArn"])
+        fields = ("instanceFinding", "currentDBInstanceClass")
+        if [first[k] for k in fields] + [_rank1_class(first)] != [rec[k] for k in fields] + [_rank1_class(rec)]:
+            raise ValueError(f"{arn}: instances {first['resourceArn']} and {rec['resourceArn']} disagree")
+    for arn, instances in members.items():
+        billed = aurora_instances(ds, arn)
+        if len(instances) != billed:
+            raise ValueError(f"{arn}: {len(instances)} instance recommendations for {billed} billed instances")
+    return list(clusters.items())
+
+
+def rds_target_cost(ds: Dataset, cls: str, instances: int) -> Decimal:
+    """Monthly on-demand instance cost of an Aurora cluster: a writer plus any readers of one class."""
     return ds.hours * ds.price("aurora_postgresql_hourly", cls) * instances
 
 
-def aurora_layout(multi_az: bool) -> str:
-    return "writer and reader" if multi_az else "writer only"
+def aurora_layout(instances: int) -> str:
+    if instances == 1:
+        return "writer only"
+    return "writer and reader" if instances == 2 else f"writer and {instances - 1} readers"
 
 
 def rightsize_rds(ds: Dataset, environment: str) -> Finding:
@@ -257,22 +323,24 @@ def rightsize_rds(ds: Dataset, environment: str) -> Finding:
         f"rightsize-rds-{environment}",
         title,
         "rightsizing",
-        basis="Current instance-hour cost from the CUR; target uses the Compute Optimizer rank-1 class and "
-        "deployment at on-demand rates. Aurora storage and I/O do not change with the instance class.",
+        basis="Current instance-hour cost from the CUR; target uses the Compute Optimizer rank-1 class at "
+        "on-demand rates, for the instance count in data/assumptions.json. "
+        "Aurora storage and I/O do not change with the instance class.",
     )
-    for rec in ds.rds_recs:
-        if rec["instanceFinding"] != "Overprovisioned" or env_of.get(rec["resourceArn"]) != environment:
+    for arn, rec in rds_clusters(ds):
+        if rec["instanceFinding"] != "Overprovisioned" or env_of.get(arn) != environment:
             continue
         option = next(o for o in rec["instanceRecommendationOptions"] if o["rank"] == 1)
-        target = rds_target_cost(ds, option["dbInstanceClass"], option["multiAZ"])
-        name = rec["resourceArn"].rsplit(":", 1)[1]
+        name = rec["dbClusterIdentifier"]
+        now, after = aurora_instances(ds, arn), aurora_target_instances(ds, name, arn)
+        target = rds_target_cost(ds, option["dbInstanceClass"], after)
         f.details.append(
             Detail(
                 rec["accountId"],
                 name,
-                f"{rec['currentDBInstanceClass']} {aurora_layout(rec['multiAZ'])} to "
-                f"{option['dbInstanceClass']} {aurora_layout(option['multiAZ'])}",
-                instance_cost[rec["resourceArn"]],
+                f"{rec['currentDBInstanceClass']} {aurora_layout(now)} to "
+                f"{option['dbInstanceClass']} {aurora_layout(after)}",
+                instance_cost[arn],
                 target,
             )
         )
@@ -402,10 +470,11 @@ def s3_lifecycle(ds: Dataset) -> Finding:
         "s3-lifecycle",
         f"Move application logs older than {after} days to S3 Glacier Instant Retrieval",
         "usage",
-        basis="GB older than the transition age repriced at the target class, minus expected "
-        "retrieval fees; the transition requests are a one-time cost.",
+        basis="GB older than the transition age repriced at the target class, minus expected retrieval fees "
+        "and the monthly transition requests for objects that reach the transition age; moving the existing "
+        "backlog is a one-time cost.",
     )
-    gb = objects = Decimal(0)
+    gb = objects = monthly_objects = Decimal(0)
     for band in ds.s3_age:
         if band["bucket"] != cfg["bucket"]:
             continue
@@ -413,6 +482,11 @@ def s3_lifecycle(ds: Dataset) -> Finding:
         if low > after:
             gb += D(band["size_gb"])
             objects += D(band["object_count"])
+        elif low == 0:
+            # The youngest band holds `high` days of new objects. In steady state each month's new objects
+            # reach the transition age once, whatever that age is, so about 30 days' worth transition a month.
+            high = int(band["age_band_days"].split("-")[1])
+            monthly_objects += D(band["object_count"]) * 30 / high
     f.details.append(
         Detail(
             _bucket_account(ds, cfg["bucket"]),
@@ -423,8 +497,11 @@ def s3_lifecycle(ds: Dataset) -> Finding:
         )
     )
     reads = D(cfg["expected_retrieval_gb_per_month"])
-    f.adjustment = -reads * ds.price("s3_glacier_ir_retrieval_per_gb")
-    f.adjustment_note = f"retrieval fees for {reads} GB of reads a month"
+    transitions = monthly_objects / 1000 * ds.price("s3_lifecycle_transition_per_1000_objects")
+    f.adjustment = -(reads * ds.price("s3_glacier_ir_retrieval_per_gb") + transitions)
+    f.adjustment_note = (
+        f"retrieval fees for {reads} GB of reads and transition requests for {monthly_objects:,} new objects a month"
+    )
     f.one_time = to_cents(objects / 1000 * ds.price("s3_lifecycle_transition_per_1000_objects"))
     return f
 
