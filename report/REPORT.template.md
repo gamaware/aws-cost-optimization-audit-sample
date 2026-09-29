@@ -201,8 +201,9 @@ for the decision and purchase.
   query before release. Excluding the storage impact keeps the savings estimate conservative.
 - **S3 lifecycle ({{s3-lifecycle.id}}).** Transition log objects after {{s3_after_days}} days to
   S3 Glacier Instant Retrieval, preserving millisecond read access. Estimated savings deduct the
-  cost of {{s3_retrieval_gb}} GB in monthly reads. A one-time transition-request expense of
-  {{s3-lifecycle.one_time}} pays back over {{s3-lifecycle.payback_months}} months.
+  cost of {{s3_retrieval_gb}} GB in monthly reads and the recurring transition requests for objects
+  that reach that age each month. Moving the existing backlog is a one-time transition-request
+  expense of {{s3-lifecycle.one_time}}, which pays back over {{s3-lifecycle.payback_months}} months.
 - **gp2 to gp3 ({{gp2-to-gp3.id}}).** Convert {{gp2-to-gp3.count}} attached gp2 volumes online.
   All are at or below 1,000 GiB, so the included gp3 capacity of 3,000 IOPS meets or exceeds their
   gp2 baseline. Volumes larger than 170 GiB receive additional provisioned throughput to preserve

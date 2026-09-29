@@ -89,6 +89,10 @@
     "target_storage_class": "GLACIER_IR",
     "expected_retrieval_gb_per_month": 50
   },
+  "aurora_target_instances": {
+    "_note": "Instances per Aurora cluster after rightsizing. Clusters not listed keep the count billed in the CUR.",
+    "orders-db-stg": 1
+  },
   "nat_consolidation": {
     "environment": "staging",
     "keep_gateways": 1
