@@ -137,13 +137,15 @@ def idle_instance_volumes(ds: Dataset) -> set[str]:
 
 def idle_instances(ds: Dataset) -> Finding:
     costs = ds.cost_by_resource()
+    volumes = idle_instance_volumes(ds)
     f = Finding(
         "idle-instances",
         "Stop, then terminate idle untagged instances",
         "idle",
-        basis="Instance hours plus attached volumes billed in the analysis period.",
+        basis="Instance hours plus attached volumes billed in the analysis period."
+        if ds.assumptions["idle"]["delete_volumes_of_idle_instances"]
+        else "Instance hours billed in the analysis period.",
     )
-    volumes = idle_instance_volumes(ds)
     for r in _flagged(ds, "Low Utilization Amazon EC2 Instances"):
         meta = r["metadata"]
         f.details.append(
@@ -249,7 +251,12 @@ def aurora_instances(ds: Dataset, arn: str) -> int:
 def aurora_target_instances(ds: Dataset, cluster_id: str, arn: str) -> int:
     """Instances after the change: the current count unless data/assumptions.json removes readers."""
     targets = {k: v for k, v in ds.assumptions["aurora_target_instances"].items() if not k.startswith("_")}
-    return int(targets[cluster_id]) if cluster_id in targets else aurora_instances(ds, arn)
+    if cluster_id not in targets:
+        return aurora_instances(ds, arn)
+    count = targets[cluster_id]
+    if isinstance(count, bool) or not isinstance(count, int) or count < 1:
+        raise ValueError(f"{cluster_id}: target instance count {count!r} is not a positive whole number")
+    return count
 
 
 def rds_cluster_arn(rec: dict) -> str:
@@ -270,17 +277,24 @@ def rds_clusters(ds: Dataset) -> list[tuple[str, dict]]:
     """(cluster ARN, recommendation) once per Aurora cluster, from the per-instance recommendations.
 
     The audit resizes every instance of a cluster to one class, so all instances of a cluster
-    must agree on the finding and the rank-1 class; a disagreement raises instead of guessing.
+    must agree on the finding and the rank-1 class, and every instance billed in the CUR must
+    have a recommendation; a disagreement or a partial cluster raises instead of guessing.
     """
     clusters: dict[str, dict] = {}
+    members: dict[str, set[str]] = {}
     for rec in ds.rds_recs:
         if "dbClusterIdentifier" not in rec:
             raise ValueError(f"{rec['resourceArn']}: not an Aurora cluster member")
         arn = rds_cluster_arn(rec)
         first = clusters.setdefault(arn, rec)
+        members.setdefault(arn, set()).add(rec["resourceArn"])
         fields = ("instanceFinding", "currentDBInstanceClass")
         if [first[k] for k in fields] + [_rank1_class(first)] != [rec[k] for k in fields] + [_rank1_class(rec)]:
             raise ValueError(f"{arn}: instances {first['resourceArn']} and {rec['resourceArn']} disagree")
+    for arn, instances in members.items():
+        billed = aurora_instances(ds, arn)
+        if len(instances) != billed:
+            raise ValueError(f"{arn}: {len(instances)} instance recommendations for {billed} billed instances")
     return list(clusters.items())
 
 
@@ -469,7 +483,8 @@ def s3_lifecycle(ds: Dataset) -> Finding:
             gb += D(band["size_gb"])
             objects += D(band["object_count"])
         elif low == 0:
-            # The youngest band holds `high` days of new objects; about 30 days' worth reach the rule each month.
+            # The youngest band holds `high` days of new objects. In steady state each month's new objects
+            # reach the transition age once, whatever that age is, so about 30 days' worth transition a month.
             high = int(band["age_band_days"].split("-")[1])
             monthly_objects += D(band["object_count"]) * 30 / high
     f.details.append(

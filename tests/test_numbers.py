@@ -141,6 +141,7 @@ def test_keeping_idle_instance_volumes_moves_them_to_gp3(ds):
     idle = audit.by_key("idle-instances").finding
     gp3 = audit.by_key("gp2-to-gp3").finding
     assert idle.monthly == money(2 * H * d("0.0832"))
+    assert idle.basis == "Instance hours billed in the analysis period."
     assert not set(idle.resources) & set(gp3.resources)
     assert gp3.monthly == money(EXPECTED["gp2-to-gp3"] + 2 * 100 * (d("0.10") - d("0.08")))
 
@@ -184,3 +185,28 @@ def test_rds_cluster_instances_must_agree(ds):
     reader["instanceRecommendationOptions"][0]["dbInstanceClass"] = "db.r5.xlarge"
     with pytest.raises(ValueError, match="disagree"):
         findings.rds_clusters(bad)
+
+
+def test_rds_cluster_needs_a_recommendation_per_billed_instance(ds):
+    import copy
+
+    from costaudit import findings
+
+    partial = copy.copy(ds)
+    partial.rds_recs = [r for r in ds.rds_recs if not r["resourceArn"].endswith("orders-db-stg-instance-2")]
+    with pytest.raises(ValueError, match="1 instance recommendations for 2 billed instances"):
+        findings.rds_clusters(partial)
+
+
+@pytest.mark.parametrize("count", [0, -1, 1.5, "1", True])
+def test_aurora_target_count_must_be_a_positive_whole_number(ds, count):
+    import copy
+
+    from costaudit import findings
+
+    bad = copy.copy(ds)
+    bad.assumptions = copy.deepcopy(ds.assumptions)
+    bad.assumptions["aurora_target_instances"]["orders-db-stg"] = count
+    arn = "arn:aws:rds:us-east-1:444455556666:cluster:orders-db-stg"
+    with pytest.raises(ValueError, match="positive whole number"):
+        findings.aurora_target_instances(bad, "orders-db-stg", arn)
