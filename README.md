@@ -160,18 +160,14 @@ Workflow-level `permissions: {}` applies to the CI jobs, which use no cloud cred
 - **Out of scope:** the audit excludes tax, credits, Support, Marketplace, Spot, multiple regions,
   containers, and data transfer architecture.
 - **A real engagement adds:** read-only collection of exports and pricing from the Price List API.
-  A readout with the client's engineers confirms effort and risk ratings. The Advanced tier of the
-  matching service offer also includes infrastructure-as-code pull requests for the top changes and a
-  follow-up cost report.
+  A readout with the client's engineers confirms effort and risk ratings. Infrastructure-as-code pull
+  requests for the top changes and a follow-up cost report can follow.
 
 ## Related work
 
-Part of the [AWS DevOps portfolio](https://github.com/gamaware/aws-devops-portfolio); it backs the "AWS cost
-optimization audit" service:
-[AWS cost optimization audit on Upwork](https://www.upwork.com/freelancers/~014b3520cf9e140103). The method is the
-one Alex uses in audits for ITESO and freelance clients in Guadalajara. Contribution, conduct and support guidelines
-are inherited from [gamaware/.github](https://github.com/gamaware/.github); see also [SECURITY.md](SECURITY.md) and
-[CHANGELOG.md](CHANGELOG.md).
+Part of the [AWS DevOps portfolio](https://github.com/gamaware/aws-devops-portfolio). Contribution,
+conduct and support guidelines are inherited from [gamaware/.github](https://github.com/gamaware/.github);
+see also [SECURITY.md](SECURITY.md) and [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 
